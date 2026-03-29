@@ -1,6 +1,6 @@
 ---
-// 矩阵网格波浪粒子背景
-// 由无数小方块组成的浩瀚波浪效果
+// 康威生命游戏波浪背景
+// 使用细胞自动机生成动态波浪效果
 ---
 
 <div class="particle-background" aria-hidden="true">
@@ -8,21 +8,26 @@
 </div>
 
 <script>
-  class MatrixWaveSystem {
+  class GameOfLifeWave {
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
-    particles: MatrixParticle[] = [];
+    cols: number = 0;
+    rows: number = 0;
+    cellSize: number = 6;
+    gap: number = 2;
+    grid: number[][] = [];
+    nextGrid: number[][] = [];
+    colors: number[][] = []; // 0 = white, 1 = green
     animationId: number = 0;
-    time: number = 0;
-    mouse = { x: 0, y: 0, active: false };
+    generation: number = 0;
+    waveOffset: number = 0;
 
-    // 网格配置
-    config = {
-      particleSize: 4,          // 每个粒子（方块）的大小
-      gap: 2,                   // 粒子之间的间隙
-      waveHeight: 150,          // 波浪高度
-      waveSpeed: 0.02,          // 波浪速度
-      waveFrequency: 0.008,     // 波浪频率
+    // 颜色配置
+    colorsConfig = {
+      white: { r: 220, g: 220, b: 220 },
+      green: { r: 80, g: 180, b: 120 },
+      darkWhite: { r: 160, g: 160, b: 160 },
+      darkGreen: { r: 60, g: 140, b: 100 },
     };
 
     constructor() {
@@ -35,7 +40,7 @@
 
     init() {
       this.resize();
-      this.createParticles();
+      this.randomizeGrid();
       this.bindEvents();
       this.animate();
     }
@@ -43,78 +48,160 @@
     resize() {
       this.canvas.width = window.innerWidth;
       this.canvas.height = window.innerHeight;
-      this.createParticles(); // 重新创建粒子以适应新尺寸
+
+      this.cols = Math.ceil(this.canvas.width / (this.cellSize + this.gap));
+      this.rows = Math.ceil(this.canvas.height / (this.cellSize + this.gap));
+
+      this.initGrids();
     }
 
-    createParticles() {
-      this.particles = [];
+    initGrids() {
+      this.grid = Array(this.rows).fill(null).map(() => Array(this.cols).fill(0));
+      this.nextGrid = Array(this.rows).fill(null).map(() => Array(this.cols).fill(0));
+      this.colors = Array(this.rows).fill(null).map(() => Array(this.cols).fill(0));
+    }
 
-      const cols = Math.ceil(this.canvas.width / (this.config.particleSize + this.config.gap));
-      const rows = Math.ceil(this.canvas.height / (this.config.particleSize + this.config.gap));
+    randomizeGrid() {
+      // 初始化随机状态，中间区域更密集
+      const centerX = Math.floor(this.cols / 2);
+      const centerY = Math.floor(this.rows / 2);
 
-      // 创建网格粒子
-      for (let col = 0; col < cols; col++) {
-        for (let row = 0; row < rows; row++) {
-          const x = col * (this.config.particleSize + this.config.gap);
-          const y = row * (this.config.particleSize + this.config.gap);
+      for (let y = 0; y < this.rows; y++) {
+        for (let x = 0; x < this.cols; x++) {
+          const distFromCenter = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
+          const maxDist = Math.sqrt(centerX ** 2 + centerY ** 2);
+          const probability = 0.08 + 0.07 * (1 - distFromCenter / maxDist);
 
-          this.particles.push(new MatrixParticle(
-            x,
-            y,
-            this.config.particleSize,
-            col,
-            row
-          ));
+          // 随机生成活细胞
+          this.grid[y][x] = Math.random() < probability ? 1 : 0;
+
+          // 随机分配颜色（白色或绿色）
+          this.colors[y][x] = Math.random() < 0.5 ? 0 : 1;
         }
       }
+    }
+
+    countNeighbors(row: number, col: number): number {
+      let count = 0;
+      for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+          if (i === 0 && j === 0) continue;
+
+          const newRow = row + i;
+          const newCol = col + j;
+
+          if (newRow >= 0 && newRow < this.rows && newCol >= 0 && newCol < this.cols) {
+            count += this.grid[newRow][newCol];
+          }
+        }
+      }
+      return count;
+    }
+
+    computeNextGeneration() {
+      for (let y = 0; y < this.rows; y++) {
+        for (let x = 0; x < this.cols; x++) {
+          const neighbors = this.countNeighbors(y, x);
+          const currentState = this.grid[y][x];
+
+          // 康威生命游戏规则
+          if (currentState === 1) {
+            // 活细胞：2或3个邻居存活，否则死亡
+            this.nextGrid[y][x] = (neighbors === 2 || neighbors === 3) ? 1 : 0;
+          } else {
+            // 死细胞：3个邻居存活则复活，或0.05%概率随机生成
+            this.nextGrid[y][x] = (neighbors === 3 || Math.random() < 0.0005) ? 1 : 0;
+          }
+
+          // 如果细胞复活且原本是死的，随机分配新颜色
+          if (this.nextGrid[y][x] === 1 && currentState === 0) {
+            this.colors[y][x] = Math.random() < 0.5 ? 0 : 1;
+          }
+        }
+      }
+
+      // 交换网格
+      [this.grid, this.nextGrid] = [this.nextGrid, this.grid];
+      this.generation++;
     }
 
     bindEvents() {
       window.addEventListener('resize', () => {
         this.resize();
+        this.randomizeGrid();
       }, { passive: true });
 
-      window.addEventListener('mousemove', (e) => {
-        this.mouse.x = e.clientX;
-        this.mouse.y = e.clientY;
-        this.mouse.active = true;
-      }, { passive: true });
-
-      window.addEventListener('mouseleave', () => {
-        this.mouse.active = false;
-      });
     }
 
     animate() {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-      this.time += 1;
+      // 每10帧更新一次生命游戏
+      if (this.generation % 10 === 0) {
+        this.computeNextGeneration();
+      }
 
-      // 计算波浪中心点
-      const waveCenterY = this.canvas.height * 0.6;
+      // 波浪偏移动画
+      this.waveOffset += 0.02;
 
-      this.particles.forEach((particle) => {
-        // 计算波浪偏移
-        const waveOffset = this.calculateWaveOffset(particle.baseX, particle.baseY, waveCenterY);
+      // 绘制网格
+      this.drawGrid();
 
-        particle.update(waveOffset, this.mouse, this.time);
-        particle.draw(this.ctx);
-      });
-
+      this.generation++;
       this.animationId = requestAnimationFrame(() => this.animate());
     }
 
-    calculateWaveOffset(x: number, y: number, centerY: number): number {
-      // 多层正弦波叠加
-      const wave1 = Math.sin(x * this.config.waveFrequency + this.time * this.config.waveSpeed);
-      const wave2 = Math.sin(x * this.config.waveFrequency * 2.5 + this.time * this.config.waveSpeed * 1.3) * 0.5;
-      const wave3 = Math.sin(x * this.config.waveFrequency * 0.5 + this.time * this.config.waveSpeed * 0.7) * 0.3;
+    drawGrid() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const centerY = this.rows / 2;
 
-      // 距离中心的衰减
-      const distFromCenter = Math.abs(y - centerY) / (this.canvas.height * 0.5);
-      const attenuation = Math.max(0, 1 - distFromCenter * 1.5);
+      for (let y = 0; y < this.rows; y++) {
+        for (let x = 0; x < this.cols; x++) {
+          if (this.grid[y][x] === 0) continue;
 
-      return (wave1 + wave2 + wave3) * this.config.waveHeight * attenuation;
+          const posX = x * (this.cellSize + this.gap);
+          const posY = y * (this.cellSize + this.gap);
+
+          // 计算波浪偏移
+          const distFromCenter = (y - centerY) / centerY;
+          const wavePhase = x * 0.1 + this.waveOffset;
+          const waveOffset = Math.sin(wavePhase) * 30 * (1 - Math.abs(distFromCenter));
+
+          const finalY = posY + waveOffset;
+
+          // 根据距离中心的远近调整透明度（形成波浪效果）
+          const opacity = 0.4 + 0.4 * (1 - Math.abs(distFromCenter));
+
+          // 获取颜色
+          const colorType = this.colors[y][x];
+          let r, g, b;
+
+          if (isDark) {
+            if (colorType === 0) {
+              r = this.colorsConfig.darkWhite.r;
+              g = this.colorsConfig.darkWhite.g;
+              b = this.colorsConfig.darkWhite.b;
+            } else {
+              r = this.colorsConfig.darkGreen.r;
+              g = this.colorsConfig.darkGreen.g;
+              b = this.colorsConfig.darkGreen.b;
+            }
+          } else {
+            if (colorType === 0) {
+              r = this.colorsConfig.white.r;
+              g = this.colorsConfig.white.g;
+              b = this.colorsConfig.white.b;
+            } else {
+              r = this.colorsConfig.green.r;
+              g = this.colorsConfig.green.g;
+              b = this.colorsConfig.green.b;
+            }
+          }
+
+          this.ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
+          this.ctx.fillRect(posX, finalY, this.cellSize, this.cellSize);
+        }
+      }
     }
 
     destroy() {
@@ -122,91 +209,14 @@
     }
   }
 
-  class MatrixParticle {
-    baseX: number;
-    baseY: number;
-    x: number;
-    y: number;
-    size: number;
-    col: number;
-    row: number;
-    opacity: number;
-    targetOpacity: number;
-
-    constructor(x: number, y: number, size: number, col: number, row: number) {
-      this.baseX = x;
-      this.baseY = y;
-      this.x = x;
-      this.y = y;
-      this.size = size;
-      this.col = col;
-      this.row = row;
-      this.opacity = 0;
-      this.targetOpacity = Math.random() * 0.3;
-    }
-
-    update(waveOffset: number, mouse: { x: number; y: number; active: boolean }, time: number) {
-      // 应用波浪偏移
-      this.y = this.baseY + waveOffset;
-
-      // 基础透明度（基于波浪高度）
-      const waveOpacity = 0.15 + Math.max(0, -waveOffset / 100) * 0.4;
-
-      // 鼠标交互
-      let mouseEffect = 0;
-      if (mouse.active) {
-        const dx = this.baseX - mouse.x;
-        const dy = this.baseY - mouse.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < 150) {
-          mouseEffect = (1 - distance / 150) * 0.5;
-        }
-      }
-
-      // 闪烁效果
-      const twinkle = Math.sin(time * 0.05 + this.col * 0.1 + this.row * 0.1) * 0.05;
-
-      this.targetOpacity = Math.min(0.8, waveOpacity + mouseEffect + twinkle);
-      this.opacity += (this.targetOpacity - this.opacity) * 0.1;
-    }
-
-    draw(ctx: CanvasRenderingContext2D) {
-      if (this.opacity < 0.01) return;
-
-      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-
-      // 颜色基于波浪高度变化
-      const heightFactor = Math.max(0, Math.min(1, (this.y - this.baseY + 100) / 200));
-
-      let r, g, b;
-      if (isDark) {
-        // 暗色模式：银灰色调
-        const intensity = 120 + heightFactor * 80;
-        r = intensity;
-        g = intensity + 10;
-        b = intensity + 20;
-      } else {
-        // 亮色模式：灰蓝色调
-        const intensity = 80 - heightFactor * 30;
-        r = intensity + 20;
-        g = intensity + 30;
-        b = intensity + 50;
-      }
-
-      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${this.opacity})`;
-      ctx.fillRect(this.x, this.y, this.size, this.size);
-    }
-  }
-
   // 初始化
   if (typeof window !== 'undefined') {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
-        new MatrixWaveSystem();
+        new GameOfLifeWave();
       });
     } else {
-      new MatrixWaveSystem();
+      new GameOfLifeWave();
     }
   }
 </script>
@@ -220,7 +230,11 @@
     height: 100%;
     pointer-events: none;
     z-index: 0;
-    opacity: 0.7;
+    background: linear-gradient(180deg,
+      rgba(20, 25, 35, 1) 0%,
+      rgba(30, 35, 50, 1) 50%,
+      rgba(25, 30, 40, 1) 100%
+    );
   }
 
   #particle-canvas {
