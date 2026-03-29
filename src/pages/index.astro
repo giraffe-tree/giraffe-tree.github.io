@@ -26,45 +26,45 @@ const tags = ["9年经验", "人本主义", "build in public"];
 <PageLayout meta={{ title: "Home" }} showHeader={false}>
   <div class="space-y-6">
     <!-- 第1层：工具栏 -->
-    <div class="flex items-center justify-end gap-3 text-sm">
+    <div class="flex items-center justify-end gap-3 text-sm pb-4 border-b border-[var(--color-border)]">
       <div class="flex items-center gap-1.5">
         <div class="flex gap-0.5" id="language-switcher">
-          <button data-lang="en" class="lang-btn px-1.5 py-0.5 rounded hover:bg-[var(--color-global-text)] hover:text-[var(--color-global-bg)] transition-colors text-muted">EN</button>
+          <button data-lang="en" class="lang-btn px-2 py-1 rounded transition-all duration-200 text-muted hover:text-[var(--color-global-text)] hover:bg-[var(--color-global-bg)]">EN</button>
           <span class="text-muted">/</span>
-          <button data-lang="zh" class="lang-btn px-1.5 py-0.5 rounded bg-[var(--color-global-text)] text-[var(--color-global-bg)] transition-colors">ZH</button>
+          <button data-lang="zh" class="lang-btn px-2 py-1 rounded transition-all duration-200 bg-[var(--color-link)] text-white">ZH</button>
           <span class="text-muted">/</span>
-          <button data-lang="auto" class="lang-btn px-1.5 py-0.5 rounded hover:bg-[var(--color-global-text)] hover:text-[var(--color-global-bg)] transition-colors text-muted">自动</button>
+          <button data-lang="auto" class="lang-btn px-2 py-1 rounded transition-all duration-200 text-muted hover:text-[var(--color-global-text)] hover:bg-[var(--color-global-bg)]">自动</button>
         </div>
       </div>
       <span class="text-muted">/</span>
       <div class="flex items-center gap-1" id="theme-switcher">
-        <button id="theme-dark" class="px-1.5 py-0.5 rounded hover:bg-[var(--color-global-text)] hover:text-[var(--color-global-bg)] transition-colors text-muted">深色</button>
+        <button id="theme-dark" class="px-2 py-1 rounded transition-all duration-200 text-muted hover:text-[var(--color-global-text)] hover:bg-[var(--color-global-bg)]">深色</button>
         <span class="text-muted">/</span>
-        <button id="theme-light" class="px-1.5 py-0.5 rounded bg-[var(--color-global-text)] text-[var(--color-global-bg)] transition-colors">浅色</button>
+        <button id="theme-light" class="px-2 py-1 rounded transition-all duration-200 bg-[var(--color-link)] text-white">浅色</button>
       </div>
     </div>
 
     <!-- 第2层：身份标题 -->
-    <div>
+    <div class="pb-4 border-b border-[var(--color-border)]">
       <p class="font-mono text-muted text-sm">ernest@hangzhou:~$ whoami</p>
       <h1 class="text-2xl font-medium text-[var(--color-global-text)] mt-1">你好，我是 Ernest</h1>
     </div>
 
     <!-- 第3层：格言 -->
-    <p class="text-lg text-muted italic pl-3 border-l-2 border-[var(--color-muted)]">
+    <p class="text-lg text-muted italic">
       活出自我
     </p>
 
     <!-- 第4层：社交链接 -->
-    <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-      <a href="https://www.xiaohongshu.com/user/profile/64be88d1000000001403cf18" target="_blank" rel="noopener" class="text-[var(--color-global-text)] hover:text-[var(--color-accent)] transition-colors underline underline-offset-2">
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm pb-4 border-b border-[var(--color-border)]">
+      <a href="https://www.xiaohongshu.com/user/profile/64be88d1000000001403cf18" target="_blank" rel="noopener" class="text-[var(--color-link)] hover:text-[var(--color-global-text)] transition-colors duration-200 hover:underline underline-offset-2">
         小红书
       </a>
-      <a href="https://github.com/giraffe-tree" target="_blank" rel="noopener" class="text-[var(--color-global-text)] hover:text-[var(--color-accent)] transition-colors underline underline-offset-2">
+      <a href="https://github.com/giraffe-tree" target="_blank" rel="noopener" class="text-[var(--color-link)] hover:text-[var(--color-global-text)] transition-colors duration-200 hover:underline underline-offset-2">
         GitHub
       </a>
       <span class="text-muted">RSS (待补充)</span>
-      <button id="copy-email" class="flex items-center gap-1 text-[var(--color-global-text)] hover:text-[var(--color-accent)] underline underline-offset-2 transition-colors" data-email="giraffetree1@gmail.com">
+      <button id="copy-email" class="flex items-center gap-1 text-[var(--color-link)] hover:text-[var(--color-global-text)] transition-colors duration-200 hover:underline underline-offset-2" data-email="giraffetree1@gmail.com">
         <span>Email</span>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
           <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
@@ -75,25 +75,25 @@ const tags = ["9年经验", "人本主义", "build in public"];
     </div>
 
     <!-- 第5层：标签 -->
-    <div class="flex flex-wrap items-center gap-2">
+    <div class="flex flex-wrap items-center gap-2 pb-4">
       {tags.map((tag) => (
-        <span class="px-2 py-0.5 text-xs border border-[var(--color-muted)] text-muted rounded">
+        <span class="px-3 py-1 text-xs bg-[var(--color-global-bg)] text-muted rounded-full border border-[var(--color-border)] hover:border-[var(--color-link)] hover:text-[var(--color-global-text)] transition-all duration-200 cursor-default">
           {tag}
         </span>
       ))}
     </div>
 
     <!-- 第6层：分类内容 -->
-    <div class="pt-8 border-t border-gray-200 dark:border-gray-800">
+    <div class="pt-6 border-t border-[var(--color-border)]">
       <!-- 分类导航 -->
-      <div class="flex items-center gap-6 mb-8 border-b border-gray-200 dark:border-gray-800">
+      <div class="flex items-center gap-6 mb-6 border-b border-[var(--color-border)]">
         {categories.map((cat, index) => (
           <button
             data-category={cat.id}
-            class={`category-tab pb-3 text-sm font-medium transition-colors border-b-2 -mb-[2px] ${
+            class={`category-tab pb-3 text-sm font-medium transition-all duration-200 border-b-2 -mb-[2px] ${
               index === 0
-                ? "border-global-text text-global-text"
-                : "border-transparent text-muted hover:text-global-text"
+                ? "border-[var(--color-link)] text-[var(--color-global-text)]"
+                : "border-transparent text-muted hover:text-[var(--color-global-text)] hover:border-[var(--color-border)]"
             }`}
           >
             {cat.name}
@@ -112,12 +112,12 @@ const tags = ["9年经验", "人本主义", "build in public"];
             {cat.posts.length === 0 ? (
               <p class="text-muted text-sm">暂无{cat.name}内容</p>
             ) : (
-              <ul class="space-y-6" role="list">
+              <ul class="space-y-2" role="list">
                 {cat.posts.slice(0, 5).map((post) => (
                   <li class="group">
-                    <a href={`/posts/${post.id}/`} class="block space-y-2">
+                    <a href={`/posts/${post.id}/`} class="block p-3 rounded-lg hover:bg-[var(--color-global-bg)] transition-all duration-200 -mx-3">
                       <div class="flex items-baseline gap-3">
-                        <h3 class="text-lg font-medium text-global-text group-hover:text-accent transition-colors">
+                        <h3 class="text-base font-medium text-[var(--color-global-text)] group-hover:text-[var(--color-link)] transition-colors duration-200">
                           {post.data.title}
                         </h3>
                         <span class="text-xs text-muted tabular-nums">
@@ -128,9 +128,9 @@ const tags = ["9年经验", "人本主义", "build in public"];
                           })}
                         </span>
                       </div>
-                      <p class="text-sm text-muted line-clamp-2">{post.data.description}</p>
+                      <p class="text-sm text-muted line-clamp-2 mt-1">{post.data.description}</p>
                       {post.data.tags.length > 0 && (
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 mt-2">
                           {post.data.tags.slice(0, 3).map((tag) => (
                             <span class="text-xs text-muted">#{tag}</span>
                           ))}
@@ -178,11 +178,11 @@ const tags = ["9年经验", "人本主义", "build in public"];
 
       // 更新标签样式
       categoryTabs.forEach((t) => {
-        t.classList.remove('border-global-text', 'text-global-text');
+        t.classList.remove('border-[var(--color-link)]', 'text-[var(--color-global-text)]');
         t.classList.add('border-transparent', 'text-muted');
       });
       tab.classList.remove('border-transparent', 'text-muted');
-      tab.classList.add('border-global-text', 'text-global-text');
+      tab.classList.add('border-[var(--color-link)]', 'text-[var(--color-global-text)]');
 
       // 更新内容显示
       categoryContents.forEach((content) => {
@@ -202,14 +202,14 @@ const tags = ["9年经验", "人本主义", "build in public"];
 
   function updateThemeButtons(theme: string) {
     if (theme === 'dark') {
-      themeDark?.classList.add('bg-[var(--color-global-text)]', 'text-[var(--color-global-bg)]');
+      themeDark?.classList.add('bg-[var(--color-link)]', 'text-white');
       themeDark?.classList.remove('text-muted');
-      themeLight?.classList.remove('bg-[var(--color-global-text)]', 'text-[var(--color-global-bg)]');
+      themeLight?.classList.remove('bg-[var(--color-link)]', 'text-white');
       themeLight?.classList.add('text-muted');
     } else {
-      themeLight?.classList.add('bg-[var(--color-global-text)]', 'text-[var(--color-global-bg)]');
+      themeLight?.classList.add('bg-[var(--color-link)]', 'text-white');
       themeLight?.classList.remove('text-muted');
-      themeDark?.classList.remove('bg-[var(--color-global-text)]', 'text-[var(--color-global-bg)]');
+      themeDark?.classList.remove('bg-[var(--color-link)]', 'text-white');
       themeDark?.classList.add('text-muted');
     }
   }
@@ -241,11 +241,11 @@ const tags = ["9年经验", "人本主义", "build in public"];
     langButtons.forEach((btn) => {
       const btnLang = btn.dataset.lang;
       if (btnLang === activeLang) {
-        btn.classList.remove('text-muted', 'hover:bg-[var(--color-global-text)]', 'hover:text-[var(--color-global-bg)]');
-        btn.classList.add('bg-[var(--color-global-text)]', 'text-[var(--color-global-bg)]');
+        btn.classList.remove('text-muted', 'hover:text-[var(--color-global-text)]', 'hover:bg-[var(--color-global-bg)]');
+        btn.classList.add('bg-[var(--color-link)]', 'text-white');
       } else {
-        btn.classList.remove('bg-[var(--color-global-text)]', 'text-[var(--color-global-bg)]');
-        btn.classList.add('text-muted', 'hover:bg-[var(--color-global-text)]', 'hover:text-[var(--color-global-bg)]');
+        btn.classList.remove('bg-[var(--color-link)]', 'text-white');
+        btn.classList.add('text-muted', 'hover:text-[var(--color-global-text)]', 'hover:bg-[var(--color-global-bg)]');
       }
     });
   }

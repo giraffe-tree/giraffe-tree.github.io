@@ -11,12 +11,17 @@
 @property --color-global-bg {
 	syntax: "<color>";
 	inherits: true;
+	initial-value: #f5f5f5;
+}
+@property --color-surface {
+	syntax: "<color>";
+	inherits: true;
 	initial-value: #ffffff;
 }
 @property --color-global-text {
 	syntax: "<color>";
 	inherits: true;
-	initial-value: #1a1a1a;
+	initial-value: #333333;
 }
 @property --color-muted {
 	syntax: "<color>";
@@ -26,33 +31,40 @@
 @property --color-link {
 	syntax: "<color>";
 	inherits: true;
-	initial-value: #1a1a1a;
+	initial-value: #333333;
 }
 @property --color-accent {
 	syntax: "<color>";
 	inherits: true;
-	initial-value: #1a1a1a;
+	initial-value: #333333;
 }
 @property --color-accent-2 {
 	syntax: "<color>";
 	inherits: true;
-	initial-value: #1a1a1a;
+	initial-value: #333333;
 }
 @property --color-quote {
 	syntax: "<color>";
 	inherits: true;
 	initial-value: #666666;
 }
+@property --color-border {
+	syntax: "<color>";
+	inherits: true;
+	initial-value: #e0e0e0;
+}
 
 /* you could refactor below to use light-dark(), depending on your target audience */
 @theme {
-	--color-global-bg: #ffffff;
-	--color-global-text: #1a1a1a;
+	--color-global-bg: #f5f5f5;
+	--color-surface: #ffffff;
+	--color-global-text: #333333;
 	--color-muted: #666666;
-	--color-link: #1a1a1a;
-	--color-accent: #1a1a1a;
-	--color-accent-2: #1a1a1a;
+	--color-link: #2a7ae2;
+	--color-accent: #2a7ae2;
+	--color-accent-2: #333333;
 	--color-quote: #666666;
+	--color-border: #e0e0e0;
 }
 
 @layer base {
@@ -67,13 +79,15 @@
 
 		&[data-theme="dark"] {
 			color-scheme: dark;
-			--color-global-bg: #0a0a0a;
-			--color-global-text: #e5e5e5;
+			--color-global-bg: #1a1a1a;
+			--color-surface: #2d2d2d;
+			--color-global-text: #e0e0e0;
 			--color-muted: #888888;
-			--color-link: #e5e5e5;
-			--color-accent: #e5e5e5;
-			--color-accent-2: #e5e5e5;
+			--color-link: #6cb4f1;
+			--color-accent: #6cb4f1;
+			--color-accent-2: #e0e0e0;
 			--color-quote: #888888;
+			--color-border: #404040;
 		}
 
 		--color-mode-transition-duration: 300ms;
