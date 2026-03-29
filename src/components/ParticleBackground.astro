@@ -1,6 +1,6 @@
 ---
-// 粒子背景特效组件
-// 使用 Canvas 实现漂浮粒子 + 连线效果
+// 波浪粒子背景特效组件
+// 使用正弦波实现大海波浪般的流动效果
 ---
 
 <div class="particle-background" aria-hidden="true">
@@ -8,23 +8,27 @@
 </div>
 
 <script>
-  class ParticleSystem {
+  class WaveParticleSystem {
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
-    particles: Particle[] = [];
+    particles: WaveParticle[] = [];
     animationId: number = 0;
+    time: number = 0;
     mouse = { x: 0, y: 0, active: false };
 
-    // 配置参数
+    // 波浪配置
     config = {
-      particleCount: 50,        // 粒子数量
-      connectionDistance: 120,  // 连线最大距离
-      mouseDistance: 150,       // 鼠标交互距离
-      speed: 0.3,              // 粒子速度
-      particleSize: { min: 2, max: 4 },
-      opacity: { min: 0.1, max: 0.4 },
-      lineOpacity: 0.15,       // 连线透明度
+      particleCount: 350,       // 粒子总数
+      layers: 3,                // 波浪层数
+      baseSpeed: 0.02,         // 基础流动速度
     };
+
+    // 每层波浪的配置
+    layerConfigs = [
+      { frequency: 0.008, amplitude: 60, speed: 0.015, opacity: 0.15, size: 2.5, yOffset: 0.3 },    // 远景
+      { frequency: 0.012, amplitude: 45, speed: 0.025, opacity: 0.25, size: 2, yOffset: 0.5 },      // 中景
+      { frequency: 0.018, amplitude: 30, speed: 0.035, opacity: 0.35, size: 1.5, yOffset: 0.7 },    // 近景
+    ];
 
     constructor() {
       this.canvas = document.getElementById('particle-canvas') as HTMLCanvasElement;
@@ -44,39 +48,42 @@
     resize() {
       const parent = this.canvas.parentElement;
       if (parent) {
-        this.canvas.width = parent.offsetWidth;
-        this.canvas.height = parent.offsetHeight;
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
       }
     }
 
     createParticles() {
       this.particles = [];
-      for (let i = 0; i < this.config.particleCount; i++) {
-        this.particles.push(new Particle(
-          this.canvas.width,
-          this.canvas.height,
-          this.config.particleSize,
-          this.config.opacity,
-          this.config.speed
-        ));
+
+      for (let layer = 0; layer < this.config.layers; layer++) {
+        const layerConfig = this.layerConfigs[layer];
+        const particlesPerLayer = Math.floor(this.config.particleCount / this.config.layers);
+
+        for (let i = 0; i < particlesPerLayer; i++) {
+          this.particles.push(new WaveParticle(
+            this.canvas.width,
+            this.canvas.height,
+            layer,
+            layerConfig,
+            i / particlesPerLayer // 在波浪上均匀分布
+          ));
+        }
       }
     }
 
     bindEvents() {
-      // 窗口大小变化
       window.addEventListener('resize', () => {
         this.resize();
         this.createParticles();
       }, { passive: true });
 
-      // 鼠标移动
       window.addEventListener('mousemove', (e) => {
         this.mouse.x = e.clientX;
         this.mouse.y = e.clientY;
         this.mouse.active = true;
       }, { passive: true });
 
-      // 鼠标离开
       window.addEventListener('mouseleave', () => {
         this.mouse.active = false;
       });
@@ -85,67 +92,44 @@
     animate() {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-      // 更新和绘制粒子
-      this.particles.forEach((particle) => {
-        particle.update(this.canvas.width, this.canvas.height);
+      this.time += 1;
+
+      // 按层排序粒子（远景先画）
+      const sortedParticles = [...this.particles].sort((a, b) => a.layer - b.layer);
+
+      sortedParticles.forEach((particle) => {
+        particle.update(this.canvas.width, this.canvas.height, this.time);
         particle.draw(this.ctx);
       });
 
-      // 绘制粒子间连线
-      this.drawConnections();
-
-      // 鼠标交互
+      // 鼠标涟漪效果
       if (this.mouse.active) {
-        this.drawMouseConnections();
+        this.drawMouseRipple();
       }
 
       this.animationId = requestAnimationFrame(() => this.animate());
     }
 
-    drawConnections() {
-      for (let i = 0; i < this.particles.length; i++) {
-        for (let j = i + 1; j < this.particles.length; j++) {
-          const dx = this.particles[i].x - this.particles[j].x;
-          const dy = this.particles[i].y - this.particles[j].y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+    drawMouseRipple() {
+      const rippleRadius = 100;
+      const gradient = this.ctx.createRadialGradient(
+        this.mouse.x, this.mouse.y, 0,
+        this.mouse.x, this.mouse.y, rippleRadius
+      );
 
-          if (distance < this.config.connectionDistance) {
-            const opacity = this.config.lineOpacity * (1 - distance / this.config.connectionDistance);
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const color = isDark ? '160, 180, 200' : '80, 100, 120';
 
-            // 根据当前主题调整线条颜色
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            const color = isDark ? '150, 150, 150' : '100, 100, 100';
+      gradient.addColorStop(0, `rgba(${color}, 0.1)`);
+      gradient.addColorStop(1, `rgba(${color}, 0)`);
 
-            this.ctx.beginPath();
-            this.ctx.strokeStyle = `rgba(${color}, ${opacity})`;
-            this.ctx.lineWidth = 0.5;
-            this.ctx.moveTo(this.particles[i].x, this.particles[j].y);
-            this.ctx.lineTo(this.particles[j].x, this.particles[j].y);
-            this.ctx.stroke();
-          }
-        }
-      }
-    }
-
-    drawMouseConnections() {
-      this.particles.forEach((particle) => {
-        const dx = particle.x - this.mouse.x;
-        const dy = particle.y - this.mouse.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < this.config.mouseDistance) {
-          const opacity = 0.3 * (1 - distance / this.config.mouseDistance);
-          const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-          const color = isDark ? '150, 150, 150' : '100, 100, 100';
-
-          this.ctx.beginPath();
-          this.ctx.strokeStyle = `rgba(${color}, ${opacity})`;
-          this.ctx.lineWidth = 0.8;
-          this.ctx.moveTo(particle.x, particle.y);
-          this.ctx.lineTo(this.mouse.x, this.mouse.y);
-          this.ctx.stroke();
-        }
-      });
+      this.ctx.fillStyle = gradient;
+      this.ctx.fillRect(
+        this.mouse.x - rippleRadius,
+        this.mouse.y - rippleRadius,
+        rippleRadius * 2,
+        rippleRadius * 2
+      );
     }
 
     destroy() {
@@ -153,64 +137,112 @@
     }
   }
 
-  class Particle {
+  class WaveParticle {
     x: number;
     y: number;
-    vx: number;
-    vy: number;
+    baseY: number;
+    layer: number;
+    phase: number;
     size: number;
     opacity: number;
+    speed: number;
+    frequency: number;
+    amplitude: number;
+    yOffset: number;
 
     constructor(
       canvasWidth: number,
       canvasHeight: number,
-      sizeRange: { min: number; max: number },
-      opacityRange: { min: number; max: number },
-      speed: number
+      layer: number,
+      config: {
+        frequency: number;
+        amplitude: number;
+        speed: number;
+        opacity: number;
+        size: number;
+        yOffset: number;
+      },
+      phase: number
     ) {
+      this.layer = layer;
+      this.phase = phase;
+      this.frequency = config.frequency;
+      this.amplitude = config.amplitude;
+      this.speed = config.speed;
+      this.opacity = config.opacity;
+      this.size = config.size + Math.random() * 1.5;
+      this.yOffset = config.yOffset;
+
+      // 初始位置
       this.x = Math.random() * canvasWidth;
-      this.y = Math.random() * canvasHeight;
-      this.vx = (Math.random() - 0.5) * speed * 2;
-      this.vy = (Math.random() - 0.5) * speed * 2;
-      this.size = Math.random() * (sizeRange.max - sizeRange.min) + sizeRange.min;
-      this.opacity = Math.random() * (opacityRange.max - opacityRange.min) + opacityRange.min;
+      this.baseY = canvasHeight * this.yOffset;
+      this.y = this.baseY;
     }
 
-    update(canvasWidth: number, canvasHeight: number) {
-      this.x += this.vx;
-      this.y += this.vy;
+    update(canvasWidth: number, canvasHeight: number, time: number) {
+      // 波浪运动：从左向右流动
+      this.x += this.speed;
 
-      // 边界检测 - 柔和反弹
-      if (this.x < 0 || this.x > canvasWidth) {
-        this.vx *= -1;
-        this.x = Math.max(0, Math.min(this.x, canvasWidth));
+      // 如果超出右边界，从左侧重新进入
+      if (this.x > canvasWidth + 50) {
+        this.x = -50;
       }
-      if (this.y < 0 || this.y > canvasHeight) {
-        this.vy *= -1;
-        this.y = Math.max(0, Math.min(this.y, canvasHeight));
-      }
+
+      // 更新基础Y位置（随窗口高度调整）
+      this.baseY = canvasHeight * this.yOffset;
+
+      // 正弦波计算Y位置
+      // 使用多个正弦波叠加产生更自然的波浪
+      const wave1 = Math.sin(this.x * this.frequency + time * 0.02);
+      const wave2 = Math.sin(this.x * this.frequency * 1.5 + time * 0.03 + this.phase * Math.PI * 2);
+
+      this.y = this.baseY + (wave1 * 0.7 + wave2 * 0.3) * this.amplitude;
     }
 
     draw(ctx: CanvasRenderingContext2D) {
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      const color = isDark ? '200, 200, 200' : '100, 100, 100';
+
+      // 波浪颜色：灰蓝色调
+      let r, g, b;
+      if (isDark) {
+        // 暗色模式：浅灰蓝
+        r = 140 + this.layer * 20;
+        g = 160 + this.layer * 20;
+        b = 180 + this.layer * 20;
+      } else {
+        // 亮色模式：深灰蓝
+        r = 100 - this.layer * 15;
+        g = 120 - this.layer * 15;
+        b = 140 - this.layer * 15;
+      }
+
+      // 根据Y位置调整透明度（波浪顶部更亮）
+      const opacityMod = 1 + Math.sin(this.y * 0.01) * 0.2;
+      const finalOpacity = this.opacity * opacityMod;
 
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${color}, ${this.opacity})`;
+      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${finalOpacity})`;
       ctx.fill();
+
+      // 添加发光效果（仅近景层）
+      if (this.layer === 2) {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${finalOpacity * 0.3})`;
+        ctx.fill();
+      }
     }
   }
 
-  // 初始化粒子系统
+  // 初始化
   if (typeof window !== 'undefined') {
-    // 页面加载完成后初始化
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
-        new ParticleSystem();
+        new WaveParticleSystem();
       });
     } else {
-      new ParticleSystem();
+      new WaveParticleSystem();
     }
   }
 </script>
@@ -222,13 +254,14 @@
     left: 0;
     width: 100%;
     height: 100%;
-    pointer-events: none;  /* 允许点击穿透 */
-    z-index: 0;           /* 在内容下方 */
-    opacity: 0.6;         /* 整体透明度 */
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.8;
   }
 
   #particle-canvas {
     width: 100%;
     height: 100%;
+    display: block;
   }
 </style>
