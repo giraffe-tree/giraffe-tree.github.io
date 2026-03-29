@@ -1,0 +1,234 @@
+---
+// 粒子背景特效组件
+// 使用 Canvas 实现漂浮粒子 + 连线效果
+---
+
+<div class="particle-background" aria-hidden="true">
+  <canvas id="particle-canvas"></canvas>
+</div>
+
+<script>
+  class ParticleSystem {
+    canvas: HTMLCanvasElement;
+    ctx: CanvasRenderingContext2D;
+    particles: Particle[] = [];
+    animationId: number = 0;
+    mouse = { x: 0, y: 0, active: false };
+
+    // 配置参数
+    config = {
+      particleCount: 50,        // 粒子数量
+      connectionDistance: 120,  // 连线最大距离
+      mouseDistance: 150,       // 鼠标交互距离
+      speed: 0.3,              // 粒子速度
+      particleSize: { min: 2, max: 4 },
+      opacity: { min: 0.1, max: 0.4 },
+      lineOpacity: 0.15,       // 连线透明度
+    };
+
+    constructor() {
+      this.canvas = document.getElementById('particle-canvas') as HTMLCanvasElement;
+      if (!this.canvas) return;
+
+      this.ctx = this.canvas.getContext('2d')!;
+      this.init();
+    }
+
+    init() {
+      this.resize();
+      this.createParticles();
+      this.bindEvents();
+      this.animate();
+    }
+
+    resize() {
+      const parent = this.canvas.parentElement;
+      if (parent) {
+        this.canvas.width = parent.offsetWidth;
+        this.canvas.height = parent.offsetHeight;
+      }
+    }
+
+    createParticles() {
+      this.particles = [];
+      for (let i = 0; i < this.config.particleCount; i++) {
+        this.particles.push(new Particle(
+          this.canvas.width,
+          this.canvas.height,
+          this.config.particleSize,
+          this.config.opacity,
+          this.config.speed
+        ));
+      }
+    }
+
+    bindEvents() {
+      // 窗口大小变化
+      window.addEventListener('resize', () => {
+        this.resize();
+        this.createParticles();
+      }, { passive: true });
+
+      // 鼠标移动
+      window.addEventListener('mousemove', (e) => {
+        this.mouse.x = e.clientX;
+        this.mouse.y = e.clientY;
+        this.mouse.active = true;
+      }, { passive: true });
+
+      // 鼠标离开
+      window.addEventListener('mouseleave', () => {
+        this.mouse.active = false;
+      });
+    }
+
+    animate() {
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+      // 更新和绘制粒子
+      this.particles.forEach((particle) => {
+        particle.update(this.canvas.width, this.canvas.height);
+        particle.draw(this.ctx);
+      });
+
+      // 绘制粒子间连线
+      this.drawConnections();
+
+      // 鼠标交互
+      if (this.mouse.active) {
+        this.drawMouseConnections();
+      }
+
+      this.animationId = requestAnimationFrame(() => this.animate());
+    }
+
+    drawConnections() {
+      for (let i = 0; i < this.particles.length; i++) {
+        for (let j = i + 1; j < this.particles.length; j++) {
+          const dx = this.particles[i].x - this.particles[j].x;
+          const dy = this.particles[i].y - this.particles[j].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < this.config.connectionDistance) {
+            const opacity = this.config.lineOpacity * (1 - distance / this.config.connectionDistance);
+
+            // 根据当前主题调整线条颜色
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const color = isDark ? '150, 150, 150' : '100, 100, 100';
+
+            this.ctx.beginPath();
+            this.ctx.strokeStyle = `rgba(${color}, ${opacity})`;
+            this.ctx.lineWidth = 0.5;
+            this.ctx.moveTo(this.particles[i].x, this.particles[j].y);
+            this.ctx.lineTo(this.particles[j].x, this.particles[j].y);
+            this.ctx.stroke();
+          }
+        }
+      }
+    }
+
+    drawMouseConnections() {
+      this.particles.forEach((particle) => {
+        const dx = particle.x - this.mouse.x;
+        const dy = particle.y - this.mouse.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < this.config.mouseDistance) {
+          const opacity = 0.3 * (1 - distance / this.config.mouseDistance);
+          const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+          const color = isDark ? '150, 150, 150' : '100, 100, 100';
+
+          this.ctx.beginPath();
+          this.ctx.strokeStyle = `rgba(${color}, ${opacity})`;
+          this.ctx.lineWidth = 0.8;
+          this.ctx.moveTo(particle.x, particle.y);
+          this.ctx.lineTo(this.mouse.x, this.mouse.y);
+          this.ctx.stroke();
+        }
+      });
+    }
+
+    destroy() {
+      cancelAnimationFrame(this.animationId);
+    }
+  }
+
+  class Particle {
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    size: number;
+    opacity: number;
+
+    constructor(
+      canvasWidth: number,
+      canvasHeight: number,
+      sizeRange: { min: number; max: number },
+      opacityRange: { min: number; max: number },
+      speed: number
+    ) {
+      this.x = Math.random() * canvasWidth;
+      this.y = Math.random() * canvasHeight;
+      this.vx = (Math.random() - 0.5) * speed * 2;
+      this.vy = (Math.random() - 0.5) * speed * 2;
+      this.size = Math.random() * (sizeRange.max - sizeRange.min) + sizeRange.min;
+      this.opacity = Math.random() * (opacityRange.max - opacityRange.min) + opacityRange.min;
+    }
+
+    update(canvasWidth: number, canvasHeight: number) {
+      this.x += this.vx;
+      this.y += this.vy;
+
+      // 边界检测 - 柔和反弹
+      if (this.x < 0 || this.x > canvasWidth) {
+        this.vx *= -1;
+        this.x = Math.max(0, Math.min(this.x, canvasWidth));
+      }
+      if (this.y < 0 || this.y > canvasHeight) {
+        this.vy *= -1;
+        this.y = Math.max(0, Math.min(this.y, canvasHeight));
+      }
+    }
+
+    draw(ctx: CanvasRenderingContext2D) {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const color = isDark ? '200, 200, 200' : '100, 100, 100';
+
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${color}, ${this.opacity})`;
+      ctx.fill();
+    }
+  }
+
+  // 初始化粒子系统
+  if (typeof window !== 'undefined') {
+    // 页面加载完成后初始化
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        new ParticleSystem();
+      });
+    } else {
+      new ParticleSystem();
+    }
+  }
+</script>
+
+<style>
+  .particle-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;  /* 允许点击穿透 */
+    z-index: 0;           /* 在内容下方 */
+    opacity: 0.6;         /* 整体透明度 */
+  }
+
+  #particle-canvas {
+    width: 100%;
+    height: 100%;
+  }
+</style>
