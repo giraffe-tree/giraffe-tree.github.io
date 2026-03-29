@@ -1,6 +1,5 @@
 ---
 import { type CollectionEntry } from "astro:content";
-import PostPreview from "@/components/blog/PostPreview.astro";
 import { getAllPosts } from "@/data/post";
 import PageLayout from "@/layouts/Base.astro";
 import { collectionDateSort } from "@/utils/date";
@@ -8,43 +7,250 @@ import { collectionDateSort } from "@/utils/date";
 const allPosts = await getAllPosts();
 const allPostsByDate = allPosts.sort(collectionDateSort) as CollectionEntry<"post">[];
 
-// Group posts by year
-const postsByYear = allPostsByDate.reduce((acc, post) => {
-  const year = new Date(post.data.publishDate).getFullYear();
-  if (!acc[year]) acc[year] = [];
-  acc[year].push(post);
-  return acc;
-}, {} as Record<number, CollectionEntry<"post">[]>);
+// Filter posts by category tags
+const projects = allPostsByDate.filter(p => p.data.tags.includes("项目"));
+const writings = allPostsByDate.filter(p => p.data.tags.includes("写作") || p.data.tags.includes("blog"));
+const photography = allPostsByDate.filter(p => p.data.tags.includes("摄影") || p.data.tags.includes("photo"));
+const travel = allPostsByDate.filter(p => p.data.tags.includes("旅行") || p.data.tags.includes("travel"));
 
-const years = Object.keys(postsByYear).map(Number).sort((a, b) => b - a);
+const categories = [
+  { id: "projects", name: "项目", posts: projects },
+  { id: "writings", name: "写作", posts: writings },
+  { id: "photography", name: "摄影", posts: photography },
+  { id: "travel", name: "旅行", posts: travel },
+];
+
+const tags = ["9年经验", "人本主义", "build in public"];
 ---
 
-<PageLayout meta={{ title: "Home" }}>
-  <section class="space-y-16">
-    {
-      years.map((year) => (
-        <div class="group">
-          <h2 class="text-muted mb-6 text-sm font-semibold tracking-wide">{year}</h2>
-          <ul class="space-y-4" role="list">
-            {postsByYear[year].map((post) => (
-              <li class="flex items-baseline gap-4">
-                <span class="text-muted text-sm tabular-nums">
-                  {new Date(post.data.publishDate).toLocaleDateString("zh-CN", {
-                    month: "2-digit",
-                    day: "2-digit",
-                  })}
-                </span>
-                <a
-                  class="text-global-text hover:text-accent transition-colors"
-                  href={`/posts/${post.id}/`}
-                >
-                  {post.data.title}
-                </a>
-              </li>
-            ))}
-          </ul>
+<PageLayout meta={{ title: "Home" }} showHeader={false}>
+  <div class="space-y-12">
+    <!-- 第1层：工具栏 -->
+    <div class="flex items-center justify-end gap-4 text-sm">
+      <div class="flex items-center gap-2">
+        <span class="text-muted">语言:</span>
+        <div class="flex gap-1" id="language-switcher">
+          <button data-lang="en" class="lang-btn px-1.5 py-0.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">EN</button>
+          <span class="text-muted">/</span>
+          <button data-lang="ja" class="lang-btn px-1.5 py-0.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">JA</button>
+          <span class="text-muted">/</span>
+          <button data-lang="zh" class="lang-btn px-1.5 py-0.5 rounded bg-gray-200 dark:bg-gray-700 transition-colors">ZH</button>
+          <span class="text-muted">/</span>
+          <button data-lang="auto" class="lang-btn px-1.5 py-0.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">自动</button>
         </div>
-      ))
-    }
-  </section>
+      </div>
+      <span class="text-muted">/</span>
+      <div class="flex items-center gap-2" id="theme-switcher">
+        <span class="text-muted">主题:</span>
+        <button id="theme-dark" class="px-1.5 py-0.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">深色</button>
+        <span class="text-muted">/</span>
+        <button id="theme-light" class="px-1.5 py-0.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">浅色</button>
+      </div>
+    </div>
+
+    <!-- 第2层：身份标题 -->
+    <div class="space-y-2">
+      <p class="font-mono text-muted text-sm">ernest@hangzhou:~$ whoami</p>
+      <h1 class="text-3xl font-medium text-global-text">你好，我是 Ernest</h1>
+    </div>
+
+    <!-- 第3层：格言 -->
+    <p class="text-xl text-muted italic pl-4 border-l-2 border-gray-300 dark:border-gray-700">
+      活出自我
+    </p>
+
+    <!-- 第4层：社交链接 -->
+    <div class="flex flex-wrap items-center gap-4 text-sm">
+      <span class="text-muted">链接:</span>
+      <a href="https://www.xiaohongshu.com/user/profile/64be88d1000000001403cf18" target="_blank" rel="noopener" class="text-global-text hover:text-accent underline underline-offset-2">
+        小红书
+      </a>
+      <a href="https://github.com/giraffe-tree" target="_blank" rel="noopener" class="text-global-text hover:text-accent underline underline-offset-2">
+        GitHub
+      </a>
+      <span class="text-muted">RSS (待补充)</span>
+      <button id="copy-email" class="flex items-center gap-1 text-global-text hover:text-accent underline underline-offset-2 transition-colors" data-email="giraffetree1@gmail.com">
+        <span>Email</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+          <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+        </svg>
+      </button>
+      <span id="copy-toast" class="text-xs text-muted opacity-0 transition-opacity">已复制!</span>
+    </div>
+
+    <!-- 第5层：标签 -->
+    <div class="flex flex-wrap items-center gap-2">
+      {tags.map((tag) => (
+        <span class="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-800 text-muted rounded-full">
+          {tag}
+        </span>
+      ))}
+    </div>
+
+    <!-- 第6层：分类内容 -->
+    <div class="pt-8 border-t border-gray-200 dark:border-gray-800">
+      <!-- 分类导航 -->
+      <div class="flex items-center gap-6 mb-8 border-b border-gray-200 dark:border-gray-800">
+        {categories.map((cat, index) => (
+          <button
+            data-category={cat.id}
+            class={`category-tab pb-3 text-sm font-medium transition-colors border-b-2 -mb-[2px] ${
+              index === 0
+                ? "border-global-text text-global-text"
+                : "border-transparent text-muted hover:text-global-text"
+            }`}
+          >
+            {cat.name}
+            <span class="ml-1 text-xs text-muted">({cat.posts.length})</span>
+          </button>
+        ))}
+      </div>
+
+      <!-- 分类内容 -->
+      <div class="category-content">
+        {categories.map((cat, index) => (
+          <div
+            data-category-content={cat.id}
+            class={index === 0 ? "" : "hidden"}
+          >
+            {cat.posts.length === 0 ? (
+              <p class="text-muted text-sm">暂无{cat.name}内容</p>
+            ) : (
+              <ul class="space-y-6" role="list">
+                {cat.posts.slice(0, 5).map((post) => (
+                  <li class="group">
+                    <a href={`/posts/${post.id}/`} class="block space-y-2">
+                      <div class="flex items-baseline gap-3">
+                        <h3 class="text-lg font-medium text-global-text group-hover:text-accent transition-colors">
+                          {post.data.title}
+                        </h3>
+                        <span class="text-xs text-muted tabular-nums">
+                          {new Date(post.data.publishDate).toLocaleDateString("zh-CN", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                          })}
+                        </span>
+                      </div>
+                      <p class="text-sm text-muted line-clamp-2">{post.data.description}</p>
+                      {post.data.tags.length > 0 && (
+                        <div class="flex gap-2">
+                          {post.data.tags.slice(0, 3).map((tag) => (
+                            <span class="text-xs text-muted">#{tag}</span>
+                          ))}
+                        </div>
+                      )}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
 </PageLayout>
+
+<script>
+  // 邮箱复制功能
+  const copyBtn = document.getElementById('copy-email');
+  const toast = document.getElementById('copy-toast');
+
+  copyBtn?.addEventListener('click', async () => {
+    const email = copyBtn.dataset.email;
+    if (email) {
+      try {
+        await navigator.clipboard.writeText(email);
+        toast?.classList.remove('opacity-0');
+        setTimeout(() => {
+          toast?.classList.add('opacity-0');
+        }, 2000);
+      } catch (err) {
+        console.error('复制失败:', err);
+      }
+    }
+  });
+
+  // 分类切换功能
+  const categoryTabs = document.querySelectorAll('.category-tab');
+  const categoryContents = document.querySelectorAll('[data-category-content]');
+
+  categoryTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const categoryId = tab.dataset.category;
+
+      // 更新标签样式
+      categoryTabs.forEach((t) => {
+        t.classList.remove('border-global-text', 'text-global-text');
+        t.classList.add('border-transparent', 'text-muted');
+      });
+      tab.classList.remove('border-transparent', 'text-muted');
+      tab.classList.add('border-global-text', 'text-global-text');
+
+      // 更新内容显示
+      categoryContents.forEach((content) => {
+        if (content.dataset.categoryContent === categoryId) {
+          content.classList.remove('hidden');
+        } else {
+          content.classList.add('hidden');
+        }
+      });
+    });
+  });
+
+  // 主题切换功能
+  const themeDark = document.getElementById('theme-dark');
+  const themeLight = document.getElementById('theme-light');
+  const html = document.documentElement;
+
+  function updateThemeButtons(theme: string) {
+    if (theme === 'dark') {
+      themeDark?.classList.add('bg-gray-800', 'text-white');
+      themeLight?.classList.remove('bg-gray-200');
+    } else {
+      themeLight?.classList.add('bg-gray-200');
+      themeDark?.classList.remove('bg-gray-800', 'text-white');
+    }
+  }
+
+  themeDark?.addEventListener('click', () => {
+    html.setAttribute('data-theme', 'dark');
+    localStorage.setItem('theme', 'dark');
+    updateThemeButtons('dark');
+  });
+
+  themeLight?.addEventListener('click', () => {
+    html.setAttribute('data-theme', 'light');
+    localStorage.setItem('theme', 'light');
+    updateThemeButtons('light');
+  });
+
+  // 初始化主题按钮状态
+  const currentTheme = html.getAttribute('data-theme') || 'light';
+  updateThemeButtons(currentTheme);
+
+  // 语言切换功能
+  const langButtons = document.querySelectorAll('.lang-btn');
+
+  langButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const lang = btn.dataset.lang;
+      localStorage.setItem('lang', lang || 'auto');
+
+      // 更新按钮样式
+      langButtons.forEach((b) => {
+        b.classList.remove('bg-gray-200', 'dark:bg-gray-700');
+        b.classList.add('hover:bg-gray-100', 'dark:hover:bg-gray-800');
+      });
+      btn.classList.remove('hover:bg-gray-100', 'dark:hover:bg-gray-800');
+      btn.classList.add('bg-gray-200', 'dark:bg-gray-700');
+
+      // 这里可以添加页面语言切换逻辑
+      if (lang && lang !== 'auto') {
+        document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang === 'ja' ? 'ja' : 'en';
+      }
+    });
+  });
+</script>

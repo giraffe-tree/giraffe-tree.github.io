@@ -9,10 +9,12 @@ import type { SiteMeta } from "@/types";
 
 interface Props {
 	meta: SiteMeta;
+	showHeader?: boolean;
 }
 
 const {
 	meta: { articleDate, description = siteConfig.description, ogImage, title },
+	showHeader = true,
 } = Astro.props;
 ---
 
@@ -25,7 +27,7 @@ const {
 		class="bg-global-bg text-global-text mx-auto flex min-h-screen max-w-2xl flex-col px-6 pt-12 font-sans text-base antialiased"
 	>
 		<SkipLink />
-		<Header />
+		{showHeader && <Header />}
 		<main id="main">
 			<slot />
 		</main>
