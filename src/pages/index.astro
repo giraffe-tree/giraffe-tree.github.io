@@ -90,13 +90,16 @@ const tags = ["9年经验", "人本主义", "build in public"];
         {categories.map((cat, index) => (
           <button
             data-category={cat.id}
-            class={`category-tab pb-3 text-sm font-medium transition-all duration-200 border-b-2 -mb-[2px] ${
+            class={`category-tab relative pb-3 px-2 -mx-2 text-sm font-medium rounded-t-lg transition-all duration-300 border-b-2 -mb-[2px] ${
               index === 0
                 ? "border-[var(--color-link)] text-[var(--color-global-text)]"
-                : "border-transparent text-muted hover:text-[var(--color-global-text)] hover:border-[var(--color-border)]"
+                : "border-transparent text-muted hover:text-[var(--color-global-text)] hover:border-[var(--color-link)] hover:bg-[var(--color-global-bg)]"
             }`}
           >
-            {cat.name}
+            <span class="relative">
+              {cat.name}
+              <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-[var(--color-link)] transition-all duration-300 group-hover:w-full"></span>
+            </span>
             <span class="ml-1 text-xs text-muted">({cat.posts.length})</span>
           </button>
         ))}
