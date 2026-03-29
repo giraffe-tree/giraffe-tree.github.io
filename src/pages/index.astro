@@ -24,52 +24,47 @@ const tags = ["9年经验", "人本主义", "build in public"];
 ---
 
 <PageLayout meta={{ title: "Home" }} showHeader={false}>
-  <div class="space-y-12">
+  <div class="space-y-6">
     <!-- 第1层：工具栏 -->
-    <div class="flex items-center justify-end gap-4 text-sm">
-      <div class="flex items-center gap-2">
-        <span class="text-muted">语言:</span>
-        <div class="flex gap-1" id="language-switcher">
-          <button data-lang="en" class="lang-btn px-1.5 py-0.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">EN</button>
+    <div class="flex items-center justify-end gap-3 text-sm">
+      <div class="flex items-center gap-1.5">
+        <div class="flex gap-0.5" id="language-switcher">
+          <button data-lang="en" class="lang-btn px-1.5 py-0.5 rounded hover:bg-[var(--color-global-text)] hover:text-[var(--color-global-bg)] transition-colors text-muted">EN</button>
           <span class="text-muted">/</span>
-          <button data-lang="ja" class="lang-btn px-1.5 py-0.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">JA</button>
+          <button data-lang="zh" class="lang-btn px-1.5 py-0.5 rounded bg-[var(--color-global-text)] text-[var(--color-global-bg)] transition-colors">ZH</button>
           <span class="text-muted">/</span>
-          <button data-lang="zh" class="lang-btn px-1.5 py-0.5 rounded bg-gray-200 dark:bg-gray-700 transition-colors">ZH</button>
-          <span class="text-muted">/</span>
-          <button data-lang="auto" class="lang-btn px-1.5 py-0.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">自动</button>
+          <button data-lang="auto" class="lang-btn px-1.5 py-0.5 rounded hover:bg-[var(--color-global-text)] hover:text-[var(--color-global-bg)] transition-colors text-muted">自动</button>
         </div>
       </div>
       <span class="text-muted">/</span>
-      <div class="flex items-center gap-2" id="theme-switcher">
-        <span class="text-muted">主题:</span>
-        <button id="theme-dark" class="px-1.5 py-0.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">深色</button>
+      <div class="flex items-center gap-1" id="theme-switcher">
+        <button id="theme-dark" class="px-1.5 py-0.5 rounded hover:bg-[var(--color-global-text)] hover:text-[var(--color-global-bg)] transition-colors text-muted">深色</button>
         <span class="text-muted">/</span>
-        <button id="theme-light" class="px-1.5 py-0.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">浅色</button>
+        <button id="theme-light" class="px-1.5 py-0.5 rounded bg-[var(--color-global-text)] text-[var(--color-global-bg)] transition-colors">浅色</button>
       </div>
     </div>
 
     <!-- 第2层：身份标题 -->
-    <div class="space-y-2">
+    <div>
       <p class="font-mono text-muted text-sm">ernest@hangzhou:~$ whoami</p>
-      <h1 class="text-3xl font-medium text-global-text">你好，我是 Ernest</h1>
+      <h1 class="text-2xl font-medium text-[var(--color-global-text)] mt-1">你好，我是 Ernest</h1>
     </div>
 
     <!-- 第3层：格言 -->
-    <p class="text-xl text-muted italic pl-4 border-l-2 border-gray-300 dark:border-gray-700">
+    <p class="text-lg text-muted italic pl-3 border-l-2 border-[var(--color-muted)]">
       活出自我
     </p>
 
     <!-- 第4层：社交链接 -->
-    <div class="flex flex-wrap items-center gap-4 text-sm">
-      <span class="text-muted">链接:</span>
-      <a href="https://www.xiaohongshu.com/user/profile/64be88d1000000001403cf18" target="_blank" rel="noopener" class="text-global-text hover:text-accent underline underline-offset-2">
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+      <a href="https://www.xiaohongshu.com/user/profile/64be88d1000000001403cf18" target="_blank" rel="noopener" class="text-[var(--color-global-text)] hover:text-[var(--color-accent)] transition-colors underline underline-offset-2">
         小红书
       </a>
-      <a href="https://github.com/giraffe-tree" target="_blank" rel="noopener" class="text-global-text hover:text-accent underline underline-offset-2">
+      <a href="https://github.com/giraffe-tree" target="_blank" rel="noopener" class="text-[var(--color-global-text)] hover:text-[var(--color-accent)] transition-colors underline underline-offset-2">
         GitHub
       </a>
       <span class="text-muted">RSS (待补充)</span>
-      <button id="copy-email" class="flex items-center gap-1 text-global-text hover:text-accent underline underline-offset-2 transition-colors" data-email="giraffetree1@gmail.com">
+      <button id="copy-email" class="flex items-center gap-1 text-[var(--color-global-text)] hover:text-[var(--color-accent)] underline underline-offset-2 transition-colors" data-email="giraffetree1@gmail.com">
         <span>Email</span>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
           <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
@@ -82,7 +77,7 @@ const tags = ["9年经验", "人本主义", "build in public"];
     <!-- 第5层：标签 -->
     <div class="flex flex-wrap items-center gap-2">
       {tags.map((tag) => (
-        <span class="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-800 text-muted rounded-full">
+        <span class="px-2 py-0.5 text-xs border border-[var(--color-muted)] text-muted rounded">
           {tag}
         </span>
       ))}
@@ -207,11 +202,15 @@ const tags = ["9年经验", "人本主义", "build in public"];
 
   function updateThemeButtons(theme: string) {
     if (theme === 'dark') {
-      themeDark?.classList.add('bg-gray-800', 'text-white');
-      themeLight?.classList.remove('bg-gray-200');
+      themeDark?.classList.add('bg-[var(--color-global-text)]', 'text-[var(--color-global-bg)]');
+      themeDark?.classList.remove('text-muted');
+      themeLight?.classList.remove('bg-[var(--color-global-text)]', 'text-[var(--color-global-bg)]');
+      themeLight?.classList.add('text-muted');
     } else {
-      themeLight?.classList.add('bg-gray-200');
-      themeDark?.classList.remove('bg-gray-800', 'text-white');
+      themeLight?.classList.add('bg-[var(--color-global-text)]', 'text-[var(--color-global-bg)]');
+      themeLight?.classList.remove('text-muted');
+      themeDark?.classList.remove('bg-[var(--color-global-text)]', 'text-[var(--color-global-bg)]');
+      themeDark?.classList.add('text-muted');
     }
   }
 
@@ -231,25 +230,35 @@ const tags = ["9年经验", "人本主义", "build in public"];
   const currentTheme = html.getAttribute('data-theme') || 'light';
   updateThemeButtons(currentTheme);
 
+  // 初始化语言按钮状态
+  const currentLang = localStorage.getItem('lang') || 'zh';
+  updateLangButtons(currentLang);
+
   // 语言切换功能
   const langButtons = document.querySelectorAll('.lang-btn');
+
+  function updateLangButtons(activeLang: string) {
+    langButtons.forEach((btn) => {
+      const btnLang = btn.dataset.lang;
+      if (btnLang === activeLang) {
+        btn.classList.remove('text-muted', 'hover:bg-[var(--color-global-text)]', 'hover:text-[var(--color-global-bg)]');
+        btn.classList.add('bg-[var(--color-global-text)]', 'text-[var(--color-global-bg)]');
+      } else {
+        btn.classList.remove('bg-[var(--color-global-text)]', 'text-[var(--color-global-bg)]');
+        btn.classList.add('text-muted', 'hover:bg-[var(--color-global-text)]', 'hover:text-[var(--color-global-bg)]');
+      }
+    });
+  }
 
   langButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
       const lang = btn.dataset.lang;
       localStorage.setItem('lang', lang || 'auto');
-
-      // 更新按钮样式
-      langButtons.forEach((b) => {
-        b.classList.remove('bg-gray-200', 'dark:bg-gray-700');
-        b.classList.add('hover:bg-gray-100', 'dark:hover:bg-gray-800');
-      });
-      btn.classList.remove('hover:bg-gray-100', 'dark:hover:bg-gray-800');
-      btn.classList.add('bg-gray-200', 'dark:bg-gray-700');
+      updateLangButtons(lang || 'zh');
 
       // 这里可以添加页面语言切换逻辑
       if (lang && lang !== 'auto') {
-        document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang === 'ja' ? 'ja' : 'en';
+        document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
       }
     });
   });
