@@ -49,15 +49,15 @@ tags: ["写作", "网络协议"]
 - 图中的 opCode = 1 请求 192.168.31.1 是谁?
     - 一般来说 ARP 请求都是广播
 
-![0](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2021/01/arp/0.png)
+![0](/img/blog/2021/01/arp/0.png)
 
 - 也有单播的
 
-![1](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2021/01/arp/1.png)
+![1](/img/blog/2021/01/arp/1.png)
 
 - 响应 opCode = 2 如图
 
-![2](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2021/01/arp/2.png)
+![2](/img/blog/2021/01/arp/2.png)
 
 ### ARP 的工作机制是怎么样的 ?
 
@@ -139,7 +139,7 @@ tcpdump -i eth0 arp
 |源硬件地址  |48   |6     |                |
 
 
-![ARP%20%E5%8D%8F%E8%AE%AE%E5%B0%8F%E7%BB%93%201bc985ea01c9464fa303d863579da1be/Untitled%203.png](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2021/01/arp/3.png)
+![ARP%20%E5%8D%8F%E8%AE%AE%E5%B0%8F%E7%BB%93%201bc985ea01c9464fa303d863579da1be/Untitled%203.png](/img/blog/2021/01/arp/3.png)
 
 ## Recite
 

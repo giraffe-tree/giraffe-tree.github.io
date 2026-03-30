@@ -18,7 +18,7 @@ tags: ["写作"]
 
 第一个分享者来自有赞, 他们的实时平台架构大概是这样的.
 
-![有赞实时平台架构](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/flink/youzan_yarn.png)
+![有赞实时平台架构](/img/blog/flink/youzan_yarn.png)
 
 他比较了一下, `Flink` 和 `SparkStructured Streaming`的区别
 
@@ -33,17 +33,17 @@ tags: ["写作"]
 
 这里他主要讲了, 如何在Spring 中使用 Flink, 主要是用了下图中的结构
 
-![Flink with spring](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/flink/youzan_spring_flink.png)
+![Flink with spring](/img/blog/flink/youzan_spring_flink.png)
 
 #### Flink 异步不支持 KeyedState
 
-![Flink 异步不支持 KeyedState](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/flink/youzan_async_keyedState.png)
+![Flink 异步不支持 KeyedState](/img/blog/flink/youzan_async_keyedState.png)
 
 #### Flink Cep
 
 cep 即 Complex event processing
 
-![youzan_cep](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/flink/youzan_cep.png)
+![youzan_cep](/img/blog/flink/youzan_cep.png)
 
 #### pdf
 
@@ -80,7 +80,7 @@ cep 即 Complex event processing
 
 今年在杭州的阿里云栖大会上, 我听了几场flink的分享, 注意到了一个东西, 就是阿里的实时计算产品 `Blink`已经提供了批流统一处理的api, `Blink`是基于`flink`开发出来的一套产品, 我看了 `blink` 的文档 [Blink batch](https://help.aliyun.com/knowledge_detail/88090.html?spm=a2c4g.11186623.6.580.1b4f4eb0N9KqiT), 已经可以试用了.
 
-![wangxin_batch_streaming](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/flink/wangxin_batch_streaming.png)
+![wangxin_batch_streaming](/img/blog/flink/wangxin_batch_streaming.png)
 
 #### open-messaging
 

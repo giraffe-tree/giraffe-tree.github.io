@@ -17,7 +17,7 @@ tags: ["写作", "java", "锁"]
 
 **第一点.** volatile 变量的写在经过 JIT 编译后, 会产生一个带 LOCK 前缀的汇编代码
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2020/07/28/volatile_write.jpg)
+![](/img/blog/2020/07/28/volatile_write.jpg)
 
 
 **第二点**, 在新版本的intel CPU上, LOCK 前缀的汇编代码实际执行的时候, 会通过缓存一致性协议(MESIF) 锁定一个缓存行, 导致引起了 false sharing 的问题
@@ -30,7 +30,7 @@ tags: ["写作", "java", "锁"]
 
 英特尔 IA-32  卷 2A 中 LOCK - Assert LOCK# Signal Prefix 中有如下解释
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2020/07/28/assert_LOCK.png)
+![](/img/blog/2020/07/28/assert_LOCK.png)
 
 个人理解是:  **在随附指令的持续时间中, 将 LOCK＃信号置位为 有效**
 
@@ -41,7 +41,7 @@ Assert（Asserting、Asserted），De-assert（Deassert、deasserting、deassert
 - De-assert： Set a signal to its “inactive” state。
 	- 解除 active 状态, 将信号变成为非 active 状态, 可以是高也可以是低电平
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2020/07/28/lock_prefix_desc.jpg)
+![](/img/blog/2020/07/28/lock_prefix_desc.jpg)
 
 里面谈到了下面两点
 
@@ -55,7 +55,7 @@ Assert（Asserting、Asserted），De-assert（Deassert、deasserting、deassert
 
 英特尔® 64 位和 IA-32 架构开发人员手册：卷 3A 8.1.4 节中有如下描述 [1]
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2020/07/28/1595949510.jpg)
+![](/img/blog/2020/07/28/1595949510.jpg)
 
 
 > 对于 Intel486 和 Pentium 处理器，始终在LOCK操作期间在总线上声明 LOCK＃信号，
@@ -113,13 +113,13 @@ Assert（Asserting、Asserted），De-assert（Deassert、deasserting、deassert
 
 ### cpu上的公平锁?
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2020/07/28/LOCK_note.png)
+![](/img/blog/2020/07/28/LOCK_note.png)
 
 硬件上不支持公平锁, 如果我们需要实现公平锁来防止饥饿, 则需要软件算法来实现
 
 ### 内存中的原子操作
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2020/07/28/atomic_op_in_memory.png)
+![](/img/blog/2020/07/28/atomic_op_in_memory.png)
 
 在 P6 家族(1995年推出的)及更新的一些处理器上, 保证了对未对齐64位的内存访问是原子操作;
 

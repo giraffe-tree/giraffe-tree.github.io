@@ -30,7 +30,7 @@ tags: ["写作", "jni", "java"]
 
 想想当年写 jni 的时候, 下面这样的代码要写几百行, 你就知道我有多痛苦了 
 
-![1570852575274](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2019/10/jna/asset/1570852575274.png)
+![1570852575274](/img/blog/2019/10/jna/asset/1570852575274.png)
 
 当然最痛苦的还不是这个
 
@@ -339,27 +339,27 @@ arrInfo[2]: 2
 
 在 idea 中进入调试
 
-![1572006969955](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2019/10/jna/asset/1572006969955.png)
+![1572006969955](/img/blog/2019/10/jna/asset/1572006969955.png)
 
 在下图中, `jps -l` 找到 java 程序的 `pid = 10560`
 
-![1572006665036](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2019/10/jna/asset/1572006665036.png)
+![1572006665036](/img/blog/2019/10/jna/asset/1572006665036.png)
 
 在 vs 中  `ctrl+alt+p` 附加到进程, 选择刚刚找到的 pid, 点击附加
 
-![1572006913302](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2019/10/jna/asset/1572006913302.png)
+![1572006913302](/img/blog/2019/10/jna/asset/1572006913302.png)
 
 此时断点不会命中
 
-![1572008782675](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2019/10/jna/asset/1572008782675.png)
+![1572008782675](/img/blog/2019/10/jna/asset/1572008782675.png)
 
 接着在 idea 中点击继续, 然后回到 vs 界面, 我们发现 断点被触发了
 
-![1572008818053](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2019/10/jna/asset/1572008818053.png)
+![1572008818053](/img/blog/2019/10/jna/asset/1572008818053.png)
 
 查看局部变量
 
-![1572008861802](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2019/10/jna/asset/1572008861802.png)
+![1572008861802](/img/blog/2019/10/jna/asset/1572008861802.png)
 
 yeah, 调试完成 =.=
 

@@ -23,7 +23,7 @@ tags: ["写作", "java"]
 
 使用后得到的日志文件目录如下
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2019/12/log4j2_log_tree.jpg)
+![](/img/blog/2019/12/log4j2_log_tree.jpg)
 
 ### maven 依赖
 

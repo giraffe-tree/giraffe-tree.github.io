@@ -16,7 +16,7 @@ tags: ["写作", "java", "并发"]
 
 原因很简单, 大部分对象只存活一小段时间. 基于这一个假设, jvm 引入了多种不同的垃圾回收算法针对不同代的垃圾回收
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/6/gc_alg.jpg)
+![](/img/blog/2020/6/gc_alg.jpg)
 
 比如在新生代我们可以频繁的使用 复制算法, 它的时间复杂度等同于存活对象的个数
 

@@ -19,11 +19,11 @@ RSA 的算法原理网上有很多, 我这边就不多说了, 下面两张图来
 
 - 加密过程
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2021/01/tls/rsa.png)
+![](/img/blog/2021/01/tls/rsa.png)
 
 - 解密过程
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2021/01/tls/rsa-de.png)
+![](/img/blog/2021/01/tls/rsa-de.png)
 
 ### 讲讲为什么 RSA 是安全的 ?
 
@@ -47,7 +47,7 @@ RSA 的算法原理网上有很多, 我这边就不多说了, 下面两张图来
 
 使用 **非对称加密传输对称密钥** 的原理都是一样的, 如下图
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2021/01/tls/RSA%20%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86.jpg)
+![](/img/blog/2021/01/tls/RSA%20非对称加密.jpg)
 
 ### 为什么现在不用非对称加密传输对称密钥
 
@@ -64,16 +64,16 @@ RSA 的算法原理网上有很多, 我这边就不多说了, 下面两张图来
 
 简单来说, 现在有两个素数 p 和 q, 当已知 x 时, 求 y 容易, 但已知 y 求 x 很难
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2021/01/tls/dh-1.png)
+![](/img/blog/2021/01/tls/dh-1.png)
 
 - client 端通过 `private key 2` 和 `public key 1` 生成密钥 X1
 - server 端通过 `private key 1` 和 `public key 2` 生成密钥 X2
 - 而通过下面的机制算法可以使得 X1= X2 = K (下图中的K )
     - 由此就可以作为 client 和 server 通讯的 对称密钥
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2021/01/tls/dh-2.png)
+![](/img/blog/2021/01/tls/dh-2.png)
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2021/01/tls/dh-3.png)
+![](/img/blog/2021/01/tls/dh-3.png)
 
 
 ### 问题

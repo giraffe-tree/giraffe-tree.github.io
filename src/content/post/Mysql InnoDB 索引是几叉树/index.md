@@ -39,7 +39,7 @@ tags: ["写作", "mysql"]
 
 索引结构: 
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/img/2019/Feb/IMG_0009.png)
+![](/img/blog/2019/Feb/IMG_0009.png)
 
 ### 表结构
 
@@ -107,9 +107,9 @@ innodb_space -s ibdata1 -T test/t2 -p 37 page-illustrate
 
 计算正确!
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/img/2019/Feb/t_illustrate.png)
+![](/img/blog/2019/Feb/t_illustrate.png)
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/img/2019/Feb/t2_illustrate.png)
+![](/img/blog/2019/Feb/t2_illustrate.png)
 
 
 

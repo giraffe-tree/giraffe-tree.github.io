@@ -119,7 +119,7 @@ Parallel Scavenge收集器提供了两个参数用于精确控制吞吐量，分
 
 下图来自于 ①
 
-![](http://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2019/10/collectors.jpg)
+![](/img/blog/2019/10/collectors.jpg)
 
 
 

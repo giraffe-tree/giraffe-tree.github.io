@@ -83,7 +83,7 @@ tags: ["写作", "kafka"]
         * 所以到这里, 第一步的问题已经有答案了, `__consumer_offsets` 这个 topic 下的分区 leader 不可用, 所以这里我们提出了第二个问题
             * `__consumer_offsets` 的 leader 为什么不可用? leader 选举失败了么?
 
-    ![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/09/rMlmGXmOyKmg8IeO.png)
+    ![图片](/img/blog/2020/09/rMlmGXmOyKmg8IeO.png)
 
 
 2. 一个不通过源码的判断方法, 方便排查问题
@@ -109,9 +109,9 @@ tags: ["写作", "kafka"]
         * 可能你还没有明白, 这里最奇怪的地方就在于,**我在 kafka 启动的配置中, 配置的 broker.id = 0 和这里的 1001 对不上**
         * 别急, 我们先看下去
 
-    ![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/09/91B3ULZQ9nnPX0Pr.png)
+    ![图片](/img/blog/2020/09/91B3ULZQ9nnPX0Pr.png)
 
-    ![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/09/G1QWx92FH1WIomFI.png)
+    ![图片](/img/blog/2020/09/G1QWx92FH1WIomFI.png)
 
 
     * 我们看看 liveReplica 是怎么算出的
@@ -120,7 +120,7 @@ tags: ["写作", "kafka"]
             * 咦, 这不就跟我配置的对上了么!
             * 但是 这个 1001 是怎么来的呢?
 
-    ![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/09/7cUofmWQxx1m2hnz.png)
+    ![图片](/img/blog/2020/09/7cUofmWQxx1m2hnz.png)
 
 
 4. 分区副本所在的 brokerId = 1001 是怎么来的?

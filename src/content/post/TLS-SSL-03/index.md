@@ -15,17 +15,17 @@ tags: ["写作", "网络协议"]
 
 - 连接时
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2021/01/tls/tls1.2-package-1.png)
+![](/img/blog/2021/01/tls/tls1.2-package-1.png)
 
 - 断开时
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2021/01/tls/tls1.2-package-2.png)
+![](/img/blog/2021/01/tls/tls1.2-package-2.png)
 
 ### 图解
 
 - 和上面的抓包图片配合一起看效果更佳~
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2021/01/tls/TLS-handshake.jpg)
+![](/img/blog/2021/01/tls/TLS-handshake.jpg)
 
 ### 解释
 

@@ -34,7 +34,7 @@ tags: ["写作", "读书"]
 >
 >另外 A, B 不会有道德负担, 他们只为自己的利益考虑
 
-![image-20201025165626474](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/10/%E5%9B%9A%E5%BE%92%E5%9B%B0%E5%A2%83.png)
+![image-20201025165626474](/img/blog/2020/10/囚徒困境.png)
 
 虽然对于 A, B 两者整体有一个最好的结局,  两人都被判 0.5 年
 
@@ -55,7 +55,7 @@ tags: ["写作", "读书"]
   - 显然 A 坦白的期望 > A 沉默时的沉默
 
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/10/%E5%9B%9A%E5%BE%92%E5%9B%B0%E5%A2%83-zero.png)
+![](/img/blog/2020/10/囚徒困境-zero.png)
 
 甚至当我们把条件改成  如果两个人都沉默, 则两个人都直接释放
 

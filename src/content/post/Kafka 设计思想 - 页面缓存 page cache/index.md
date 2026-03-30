@@ -32,7 +32,7 @@ tags: ["写作", "kafka", "linux"]
 
 下图来自 参考[5.a]
 
-![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/11/qLnUYxw1wrK97iP8.png)
+![图片](/img/blog/2020/11/qLnUYxw1wrK97iP8.png)
 
 ### 为什么要用 page cache
 
@@ -48,15 +48,15 @@ zero-copy 协议对于网络链接容量接近或超过CPU处理能力的高速�
 
 * 普通文件读出, 并通过网卡发出
 
-![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/11/qCSSEong8bWLhJAI.png)
+![图片](/img/blog/2020/11/qCSSEong8bWLhJAI.png)
 
 * 使用 sendfile 的 zero-copy 技术
 
-![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/11/mAEMoCXR8CIcpKQG.png)
+![图片](/img/blog/2020/11/mAEMoCXR8CIcpKQG.png)
 
 * 如果网卡支持 SG-DMA The Scatter-Gather Direct Memory Access
 
-![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/11/m8Y7DzPjkeqvvOco.png)
+![图片](/img/blog/2020/11/m8Y7DzPjkeqvvOco.png)
 
 ### zero-copy 的优势
 
@@ -172,7 +172,7 @@ dd if=/dev/urandom of=./tmp.file bs=1M count=500
     * buff 和 cache 就是我们前面看到的 Buffers 和 Cache，单位是 KB。
     * bi 和 bo 则分别表示块设备读取和写入的大小，单位为块 / 秒。因为 Linux 中块的大小是 1KB，所以这个单位也就等价于 KB/s。
 
-![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/11/CTrvRngfYdJJjjyk.png)
+![图片](/img/blog/2020/11/CTrvRngfYdJJjjyk.png)
 
 * 上面这个例子说明了在写文件时也会用到 Cache
 * 而写磁盘时,  buffer 会出现增长 (好吧, 由于我只有一块磁盘...这里就没有做演示)
@@ -192,7 +192,7 @@ dd if=./tmp.file of=/dev/null
 
 * 可以看到 bi (block 读取) 有变化,  cache 一直在增长
 
-![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/11/DrBDxL2BSZN14qN6.png)
+![图片](/img/blog/2020/11/DrBDxL2BSZN14qN6.png)
 
 ### 读磁盘对 page cache 的影响
 
@@ -211,7 +211,7 @@ dd if=/dev/vda1 of=/dev/null bs=1M count=1024
 
 * 总结下,**Buffer 既可以用作“将要写入磁盘数据的缓存”，也可以用作“从磁盘读取数据的缓存”。Cache 既可以用作“从文件读取数据的页缓存”，也可以用作“写文件的页缓存”。**
 
-![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/11/5gFwuiMOLu9PmuhI.png)
+![图片](/img/blog/2020/11/5gFwuiMOLu9PmuhI.png)
 
 ### Page Cache 如何产生
 
@@ -228,11 +228,11 @@ dd if=/dev/vda1 of=/dev/null bs=1M count=1024
 * 检查 free
     * `free -k / free -m / free -g`
 
-![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/11/WoR7AnUF8MPTJsW9.png)
+![图片](/img/blog/2020/11/WoR7AnUF8MPTJsW9.png)
 
 * 参考 [10.a]
 
-![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/11/vJMXnS2lgsPsPcN7.png)
+![图片](/img/blog/2020/11/vJMXnS2lgsPsPcN7.png)
 
 ### Page Cache 如何死亡(被回收)?
 
@@ -250,7 +250,7 @@ dd if=/dev/vda1 of=/dev/null bs=1M count=1024
     * 第一次读取文件后，文件内容都是inactive的，只有再次读取这些内容后，才会把它放在active链表上, 处于inactive链表上的pagecache在内存紧张是会首先被回收掉
     * 第二次读取后, 这些内容就会从inactive链表里给promote到active链表里 (二次机会法)
 
-![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/11/jJURiXNsSwrlsSxh.png)
+![图片](/img/blog/2020/11/jJURiXNsSwrlsSxh.png)
 
 ## 其他
 

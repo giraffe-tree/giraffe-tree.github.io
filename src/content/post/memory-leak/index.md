@@ -24,11 +24,11 @@ tags: ["写作", "jni", "java"]
 RES (resident memory usage 常驻内存, 进程当前使用的内存) 一直在增长
 并且远大于设定的最大堆, 猜测可能有堆外内存溢出
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2019/11/memory-leak/top_res_large.jpg)
+![](/img/blog/2019/11/memory-leak/top_res_large.jpg)
 
 再经过一段时间的压力测试后, 肯定不正常了, RES 为1.3g 远超限定的 512M
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2019/11/memory-leak/top_res_large_large.jpg)
+![](/img/blog/2019/11/memory-leak/top_res_large_large.jpg)
 
 
 使用 arthas 验证下我们的想法
@@ -39,11 +39,11 @@ docker exec -it async-project /bin/bash -c "java -jar arthas-boot.jar"
 docker exec -it async-project /bin/bash -c "wget https://alibaba.github.io/arthas/arthas-boot.jar && java -jar arthas-boot.jar"
 ```
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2019/11/memory-leak/arthas_no_change.jpg)
+![](/img/blog/2019/11/memory-leak/arthas_no_change.jpg)
 
 在运行一段时间后没有明显变化
 
-![](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/2019/11/memory-leak/arthas_normal.jpg)
+![](/img/blog/2019/11/memory-leak/arthas_normal.jpg)
 
 ### 新增jvm参数 `-XX:NativeMemoryTracking=detail`
 

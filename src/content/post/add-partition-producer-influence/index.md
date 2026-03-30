@@ -34,13 +34,13 @@ producer 获取分区信息跟 metadata 请求有着密切的联系, 有兴趣�
 * 发送 metadata 请求
     * 主要方法是**NetworkClients.sendInternalMetadataRequest**
 
-![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/08/iM6wpbsxrvjBkPPX.png)
+![图片](/img/blog/2020/08/iM6wpbsxrvjBkPPX.png)
 
 
 * 收到 metadata 响应
     * 主要方法是**ProducerMetadata.updata**
 
-![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/08/K6wnnjj5vsBzxtjY.png)
+![图片](/img/blog/2020/08/K6wnnjj5vsBzxtjY.png)
 
 ## Producer 发送数据时, 什么时候去拿分区信息的?
 
@@ -53,25 +53,25 @@ Producer 获取 分区信息, 我这边分为 两部分来讲 , 一个是主线�
 
 1. 主线程调用 KafkaProducer 构造函数时会创建一个 `kafka-producer-network-thread | producer-1`的线程, 请注意和 main 主线程做区分
 
-    ![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/08/BiaJMfWLSNgzjv2a.png)
+    ![图片](/img/blog/2020/08/BiaJMfWLSNgzjv2a.png)
 
 2. 当主线程第一次调用  producer.send 后,  会等待版本初始化更新
     
     -  主要调用了**KafkaProducer.waitOnMetadata**方法
 
-    ![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/08/x4je5FF4CXAHH0d2.png)
+    ![图片](/img/blog/2020/08/x4je5FF4CXAHH0d2.png)
 
 3. 接着调用了**ProducerMetadata.awaitUpdate**方法
     1. 注意这里的 SystemTime 将 this (producerMetadata 对象本身) 传了进去, 作为同步块的同步对象
     2. 然后开始 wait
     3. **这个伏笔 this 会在之后, ProducerMetadata 更新时被唤醒**
 
-    ![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/08/ad22WAk3BWGSabtT.png)
+    ![图片](/img/blog/2020/08/ad22WAk3BWGSabtT.png)
 
 4. 继续看到 time.waitObject , 这个方法其实是个死循环, 知道条件满足, 才会返回
    - 其实就是等待, 直到元数据被拉取下来
 
-    ![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/08/ud7TGTitGiZgf7A9.png)
+    ![图片](/img/blog/2020/08/ud7TGTitGiZgf7A9.png)
 
 ### producer 线程部分
 
@@ -103,7 +103,7 @@ Producer 获取 分区信息, 我这边分为 两部分来讲 , 一个是主线�
 
 2. producer 首先需要连接到 kafka 服务器
 
-    ![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/08/SSMPelwKjYxVr4gB.png)
+    ![图片](/img/blog/2020/08/SSMPelwKjYxVr4gB.png)
 
     ```java
     private void initiateConnect(Node node, long now) {
@@ -130,7 +130,7 @@ Producer 获取 分区信息, 我这边分为 两部分来讲 , 一个是主线�
 
     - **这里的3,4,5步其实和本节探讨的问题没有关联, 直接跳到第6步看就行**
 
-    ![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/08/nSiru8S9hZVf1Gwl.png)
+    ![图片](/img/blog/2020/08/nSiru8S9hZVf1Gwl.png)
 
     ```java
     private void handleConnections() {
@@ -153,9 +153,9 @@ Producer 获取 分区信息, 我这边分为 两部分来讲 , 一个是主线�
 
 4. 在poll循环过程中, handleInitiateApiVersionRequests 会向服务器发送  ApiVersionRequest
 
-    ![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/08/FYLu6KjGnnmUL6Kp.png)
+    ![图片](/img/blog/2020/08/FYLu6KjGnnmUL6Kp.png)
 
-    ![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/08/JCj4Cv5Ifj5zdQrQ.png)
+    ![图片](/img/blog/2020/08/JCj4Cv5Ifj5zdQrQ.png)
 
 
 5. handleInitiateApiVersionRequests 会取出 nodesNeedingApiVersionsFetch 中的拉取请求, 并发送正式的客户端请求给 服务器
@@ -179,18 +179,18 @@ Producer 获取 分区信息, 我这边分为 两部分来讲 , 一个是主线�
 
 6. 当连接上服务器后, maybeUpdata 方法中会发送内部元数据请求
 
-    ![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/08/W2KA8wVNPZYiQ3Vh.png)
+    ![图片](/img/blog/2020/08/W2KA8wVNPZYiQ3Vh.png)
 
 7. 收到元数据请求的响应时, 更新元数据 Metadata.update
 
-    ![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/08/tE5QkXWUzuCT4Ml4.png)
+    ![图片](/img/blog/2020/08/tE5QkXWUzuCT4Ml4.png)
 
 
 * ProducerMetadata.notifyAll 唤醒条件不满足的线程, 于是主线程, 继续执行, 拿到了 metadata
     * 这里其实就是一个典型的 MESA 管程应用
     * 另外, 这里要写成 notifyAll() , 否则多个线程 同时使用 一个 producer 发送数据时, 可能会导致有一些线程拿不到锁, 饿死....
 
-    ![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/08/WLLjoWdWUB3VQccY.png)
+    ![图片](/img/blog/2020/08/WLLjoWdWUB3VQccY.png)
 
 ### 如何确定消息发给的分区
 
@@ -238,5 +238,5 @@ private int partition(ProducerRecord<K, V> record, byte[] serializedKey, byte[] 
 
     * 新增 分区时 producer 客户端 metadata 类的日志内容示例
 
-    ![图片](https://open-chen.oss-cn-hangzhou.aliyuncs.com/open/blog/2020/08/NHIzYvgqmd8gH9Fv.png)
+    ![图片](/img/blog/2020/08/NHIzYvgqmd8gH9Fv.png)
 
