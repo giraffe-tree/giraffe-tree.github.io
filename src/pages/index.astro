@@ -14,10 +14,10 @@ const photography = allPostsByDate.filter(p => p.data.tags.includes("摄影") ||
 const travel = allPostsByDate.filter(p => p.data.tags.includes("旅行") || p.data.tags.includes("travel"));
 
 const categories = [
-  { id: "projects", name: "项目", posts: projects },
-  { id: "writings", name: "写作", posts: writings },
-  { id: "photography", name: "摄影", posts: photography },
-  { id: "travel", name: "旅行", posts: travel },
+  { id: "writings", name: "写作", tag: "写作", posts: writings },
+  { id: "projects", name: "项目", tag: "项目", posts: projects },
+  { id: "photography", name: "摄影", tag: "摄影", posts: photography },
+  { id: "travel", name: "旅行", tag: "旅行", posts: travel },
 ];
 
 const tags = ["9年经验", "人本主义", "build in public"];
@@ -46,9 +46,85 @@ const tags = ["9年经验", "人本主义", "build in public"];
 
     <!-- 第2层：身份标题 -->
     <div class="pb-4 border-b border-[var(--color-border)]">
-      <p class="font-mono text-muted text-sm">ernest@hangzhou:~$ whoami</p>
-      <h1 class="text-2xl font-medium text-[var(--color-global-text)] mt-1">你好，我是 Ernest</h1>
+      <!-- 命令行输入 -->
+      <div class="font-mono text-muted text-sm min-h-[1.5em]">
+        <span class="terminal-prompt">ernest@hangzhou:~$ </span>
+        <span id="typewriter-command"></span><span id="command-cursor" class="cursor">█</span>
+      </div>
+      <!-- 命令输出 -->
+      <div class="text-2xl font-medium text-[var(--color-global-text)] mt-2 min-h-[1.5em]">
+        <span id="typewriter-output"></span><span id="output-cursor" class="cursor hidden">█</span>
+      </div>
     </div>
+
+    <style>
+      .cursor {
+        display: inline-block;
+        animation: blink 1s step-end infinite;
+        color: var(--color-link);
+        font-weight: normal;
+      }
+      .cursor.typing {
+        animation: none;
+        opacity: 1;
+      }
+      @keyframes blink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0; }
+      }
+    </style>
+
+    <script>
+      // 打字机动画
+      const commandText = 'whoami';
+      const outputText = '你好，我是 Ernest，一个喜欢写代码和思考的开发者。';
+      const commandEl = document.getElementById('typewriter-command');
+      const outputEl = document.getElementById('typewriter-output');
+      const commandCursor = document.getElementById('command-cursor');
+      const outputCursor = document.getElementById('output-cursor');
+
+      async function typeText(element: HTMLElement, text: string, speed: number = 80): Promise<void> {
+        return new Promise((resolve) => {
+          let i = 0;
+          const type = () => {
+            if (i < text.length) {
+              element.textContent += text[i];
+              i++;
+              setTimeout(type, speed + Math.random() * 40 - 20);
+            } else {
+              resolve();
+            }
+          };
+          type();
+        });
+      }
+
+      async function startTypewriter() {
+        // 第一阶段：输入 whoami
+        commandCursor?.classList.add('typing');
+        await typeText(commandEl!, commandText, 100);
+        commandCursor?.classList.remove('typing');
+
+        // 停顿一下
+        await new Promise(r => setTimeout(r, 400));
+
+        // 隐藏命令行光标，显示输出行光标
+        commandCursor?.classList.add('hidden');
+        outputCursor?.classList.remove('hidden');
+        outputCursor?.classList.add('typing');
+
+        // 第二阶段：输出个人介绍
+        await typeText(outputEl!, outputText, 60);
+        outputCursor?.classList.remove('typing');
+      }
+
+      // 页面加载后开始动画
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startTypewriter);
+      } else {
+        startTypewriter();
+      }
+    </script>
 
     <!-- 第3层：格言 -->
     <p class="text-lg text-muted italic">
@@ -115,34 +191,46 @@ const tags = ["9年经验", "人本主义", "build in public"];
             {cat.posts.length === 0 ? (
               <p class="text-muted text-sm">暂无{cat.name}内容</p>
             ) : (
-              <ul class="space-y-2" role="list">
-                {cat.posts.slice(0, 5).map((post) => (
-                  <li class="group">
-                    <a href={`/posts/${post.id}/`} class="block p-3 rounded-lg hover:bg-[var(--color-global-bg)] transition-all duration-200 -mx-3">
-                      <div class="flex items-baseline gap-3">
-                        <h3 class="text-base font-medium text-[var(--color-global-text)] group-hover:text-[var(--color-link)] transition-colors duration-200">
-                          {post.data.title}
-                        </h3>
-                        <span class="text-xs text-muted tabular-nums">
-                          {new Date(post.data.publishDate).toLocaleDateString("zh-CN", {
-                            year: "numeric",
-                            month: "2-digit",
-                            day: "2-digit",
-                          })}
-                        </span>
-                      </div>
-                      <p class="text-sm text-muted line-clamp-2 mt-1">{post.data.description}</p>
-                      {post.data.tags.length > 0 && (
-                        <div class="flex gap-2 mt-2">
-                          {post.data.tags.slice(0, 3).map((tag) => (
-                            <span class="text-xs text-muted">#{tag}</span>
-                          ))}
+              <>
+                <ul class="space-y-2" role="list">
+                  {cat.posts.slice(0, 5).map((post) => (
+                    <li class="group">
+                      <a href={`/posts/${post.id}/`} class="block p-3 rounded-lg hover:bg-[var(--color-global-bg)] transition-all duration-200 -mx-3">
+                        <div class="flex items-baseline gap-3">
+                          <h3 class="text-base font-medium text-[var(--color-global-text)] group-hover:text-[var(--color-link)] transition-colors duration-200">
+                            {post.data.title}
+                          </h3>
+                          <span class="text-xs text-muted tabular-nums">
+                            {new Date(post.data.publishDate).toLocaleDateString("zh-CN", {
+                              year: "numeric",
+                              month: "2-digit",
+                              day: "2-digit",
+                            })}
+                          </span>
                         </div>
-                      )}
+                        <p class="text-sm text-muted line-clamp-2 mt-1">{post.data.description}</p>
+                        {post.data.tags.length > 0 && (
+                          <div class="flex gap-2 mt-2">
+                            {post.data.tags.slice(0, 3).map((tag) => (
+                              <span class="text-xs text-muted">#{tag}</span>
+                            ))}
+                          </div>
+                        )}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                {cat.posts.length > 5 && (
+                  <div class="mt-4 pt-4 border-t border-[var(--color-border)]">
+                    <a href={`/tags/${cat.tag}/`} class="inline-flex items-center gap-1 text-sm text-[var(--color-link)] hover:text-[var(--color-global-text)] transition-colors duration-200">
+                      <span>查看更多</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                      </svg>
                     </a>
-                  </li>
-                ))}
-              </ul>
+                  </div>
+                )}
+              </>
             )}
           </div>
         ))}

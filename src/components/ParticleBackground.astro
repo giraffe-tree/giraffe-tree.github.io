@@ -15,12 +15,25 @@
     rows: number = 0;
     cellSize: number = 6;
     gap: number = 2;
-    grid: number[][] = [];
-    nextGrid: number[][] = [];
-    colors: number[][] = []; // 0 = white, 1 = green
+    // 优化：使用 Uint8Array 替代二维数组
+    grid: Uint8Array = new Uint8Array(0);
+    nextGrid: Uint8Array = new Uint8Array(0);
+    colors: Uint8Array = new Uint8Array(0); // 0 = white, 1 = green
     animationId: number = 0;
     generation: number = 0;
     waveOffset: number = 0;
+    // 优化：ImageData 直接操作像素
+    imageData: ImageData | null = null;
+    pixelBuffer: Uint32Array = new Uint32Array(0);
+    // 优化：颜色查找表（ABGR 格式 for little-endian）
+    colorLookupWhite: Uint32Array = new Uint32Array(256);
+    colorLookupGreen: Uint32Array = new Uint32Array(256);
+    colorLookupDarkWhite: Uint32Array = new Uint32Array(256);
+    colorLookupDarkGreen: Uint32Array = new Uint32Array(256);
+    // 优化：波浪偏移查找表
+    waveLookup: Float32Array = new Float32Array(0);
+    // 优化：脏矩形标记
+    dirtyCells: boolean[] = [];
 
     // 颜色配置
     colorsConfig = {
@@ -35,7 +48,28 @@
       if (!this.canvas) return;
 
       this.ctx = this.canvas.getContext('2d')!;
+      this.initColorLookup();
       this.init();
+    }
+
+    // 优化：预计算颜色查找表
+    initColorLookup() {
+      const configs = [
+        { base: this.colorsConfig.white, lookup: this.colorLookupWhite },
+        { base: this.colorsConfig.green, lookup: this.colorLookupGreen },
+        { base: this.colorsConfig.darkWhite, lookup: this.colorLookupDarkWhite },
+        { base: this.colorsConfig.darkGreen, lookup: this.colorLookupDarkGreen },
+      ];
+
+      for (const { base, lookup } of configs) {
+        for (let i = 0; i < 256; i++) {
+          // 将 0-255 映射到 0.4-0.8 的透明度范围
+          const alpha = 0.4 + (i / 255) * 0.4;
+          const a = Math.floor(alpha * 255);
+          // ABGR 格式 (little-endian)
+          lookup[i] = (a << 24) | (base.b << 16) | (base.g << 8) | base.r;
+        }
+      }
     }
 
     init() {
@@ -46,43 +80,63 @@
     }
 
     resize() {
-      this.canvas.width = window.innerWidth;
-      this.canvas.height = window.innerHeight;
+      // 使用 devicePixelRatio 优化清晰度
+      const dpr = window.devicePixelRatio || 1;
+      this.canvas.width = Math.floor(window.innerWidth * dpr);
+      this.canvas.height = Math.floor(window.innerHeight * dpr);
+      this.canvas.style.width = window.innerWidth + 'px';
+      this.canvas.style.height = window.innerHeight + 'px';
 
-      this.cols = Math.ceil(this.canvas.width / (this.cellSize + this.gap));
-      this.rows = Math.ceil(this.canvas.height / (this.cellSize + this.gap));
+      // 根据物理像素计算行列
+      const physicalCellSize = this.cellSize * dpr;
+      const physicalGap = this.gap * dpr;
+
+      this.cols = Math.ceil(this.canvas.width / (physicalCellSize + physicalGap));
+      this.rows = Math.ceil(this.canvas.height / (physicalCellSize + physicalGap));
 
       this.initGrids();
     }
 
     initGrids() {
-      this.grid = Array(this.rows).fill(null).map(() => Array(this.cols).fill(0));
-      this.nextGrid = Array(this.rows).fill(null).map(() => Array(this.cols).fill(0));
-      this.colors = Array(this.rows).fill(null).map(() => Array(this.cols).fill(0));
+      const size = this.rows * this.cols;
+      this.grid = new Uint8Array(size);
+      this.nextGrid = new Uint8Array(size);
+      this.colors = new Uint8Array(size);
+      this.dirtyCells = new Array(size).fill(true);
+      this.waveLookup = new Float32Array(this.cols);
+
+      // 创建 ImageData 用于直接像素操作
+      this.imageData = this.ctx.createImageData(this.canvas.width, this.canvas.height);
+      this.pixelBuffer = new Uint32Array(this.imageData.data.buffer);
     }
 
     randomizeGrid() {
       // 初始化随机状态，中间区域更密集
       const centerX = Math.floor(this.cols / 2);
       const centerY = Math.floor(this.rows / 2);
+      const maxDist = Math.sqrt(centerX ** 2 + centerY ** 2);
 
       for (let y = 0; y < this.rows; y++) {
         for (let x = 0; x < this.cols; x++) {
+          const idx = y * this.cols + x;
           const distFromCenter = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
-          const maxDist = Math.sqrt(centerX ** 2 + centerY ** 2);
           const probability = 0.08 + 0.07 * (1 - distFromCenter / maxDist);
 
           // 随机生成活细胞
-          this.grid[y][x] = Math.random() < probability ? 1 : 0;
+          this.grid[idx] = Math.random() < probability ? 1 : 0;
 
           // 随机分配颜色（白色或绿色）
-          this.colors[y][x] = Math.random() < 0.5 ? 0 : 1;
+          this.colors[idx] = Math.random() < 0.5 ? 0 : 1;
+          this.dirtyCells[idx] = true;
         }
       }
     }
 
     countNeighbors(row: number, col: number): number {
       let count = 0;
+      const cols = this.cols;
+      const rows = this.rows;
+
       for (let i = -1; i <= 1; i++) {
         for (let j = -1; j <= 1; j++) {
           if (i === 0 && j === 0) continue;
@@ -90,8 +144,8 @@
           const newRow = row + i;
           const newCol = col + j;
 
-          if (newRow >= 0 && newRow < this.rows && newCol >= 0 && newCol < this.cols) {
-            count += this.grid[newRow][newCol];
+          if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
+            count += this.grid[newRow * cols + newCol];
           }
         }
       }
@@ -99,24 +153,31 @@
     }
 
     computeNextGeneration() {
-      for (let y = 0; y < this.rows; y++) {
-        for (let x = 0; x < this.cols; x++) {
+      const cols = this.cols;
+      const rows = this.rows;
+
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          const idx = y * cols + x;
           const neighbors = this.countNeighbors(y, x);
-          const currentState = this.grid[y][x];
+          const currentState = this.grid[idx];
 
           // 康威生命游戏规则
           if (currentState === 1) {
             // 活细胞：2或3个邻居存活，否则死亡
-            this.nextGrid[y][x] = (neighbors === 2 || neighbors === 3) ? 1 : 0;
+            this.nextGrid[idx] = (neighbors === 2 || neighbors === 3) ? 1 : 0;
           } else {
             // 死细胞：3个邻居存活则复活，或0.05%概率随机生成
-            this.nextGrid[y][x] = (neighbors === 3 || Math.random() < 0.0005) ? 1 : 0;
+            this.nextGrid[idx] = (neighbors === 3 || Math.random() < 0.0005) ? 1 : 0;
           }
 
           // 如果细胞复活且原本是死的，随机分配新颜色
-          if (this.nextGrid[y][x] === 1 && currentState === 0) {
-            this.colors[y][x] = Math.random() < 0.5 ? 0 : 1;
+          if (this.nextGrid[idx] === 1 && currentState === 0) {
+            this.colors[idx] = Math.random() < 0.5 ? 0 : 1;
           }
+
+          // 标记变化的细胞
+          this.dirtyCells[idx] = this.nextGrid[idx] !== currentState;
         }
       }
 
@@ -134,8 +195,6 @@
     }
 
     animate() {
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
       // 每10帧更新一次生命游戏
       if (this.generation % 10 === 0) {
         this.computeNextGeneration();
@@ -143,6 +202,12 @@
 
       // 波浪偏移动画
       this.waveOffset += 0.02;
+
+      // 预计算波浪偏移查找表
+      const centerY = this.rows / 2;
+      for (let x = 0; x < this.cols; x++) {
+        this.waveLookup[x] = Math.sin(x * 0.1 + this.waveOffset);
+      }
 
       // 绘制网格
       this.drawGrid();
@@ -152,56 +217,67 @@
     }
 
     drawGrid() {
+      if (!this.imageData) return;
+
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       const centerY = this.rows / 2;
+      const cols = this.cols;
+      const dpr = window.devicePixelRatio || 1;
+      const physicalCellSize = Math.floor(this.cellSize * dpr);
+      const physicalGap = Math.floor(this.gap * dpr);
+      const canvasWidth = this.canvas.width;
+      const canvasHeight = this.canvas.height;
+      const buffer = this.pixelBuffer;
 
+      // 选择颜色查找表
+      const whiteLookup = isDark ? this.colorLookupDarkWhite : this.colorLookupWhite;
+      const greenLookup = isDark ? this.colorLookupDarkGreen : this.colorLookupGreen;
+
+      // 清空画布（使用零填充）
+      buffer.fill(0);
+
+      // 绘制所有细胞到像素缓冲区
       for (let y = 0; y < this.rows; y++) {
-        for (let x = 0; x < this.cols; x++) {
-          if (this.grid[y][x] === 0) continue;
+        const distFromCenter = (y - centerY) / centerY;
+        const distAbs = Math.abs(distFromCenter);
+        const opacityIndex = Math.floor((1 - distAbs) * 255);
 
-          const posX = x * (this.cellSize + this.gap);
-          const posY = y * (this.cellSize + this.gap);
+        for (let x = 0; x < cols; x++) {
+          const idx = y * cols + x;
 
-          // 计算波浪偏移
-          const distFromCenter = (y - centerY) / centerY;
-          const wavePhase = x * 0.1 + this.waveOffset;
-          const waveOffset = Math.sin(wavePhase) * 30 * (1 - Math.abs(distFromCenter));
+          if (this.grid[idx] === 0) continue;
 
-          const finalY = posY + waveOffset;
+          // 计算波浪偏移（每列独立）
+          const waveOffset = this.waveLookup[x] * 30 * dpr * (1 - distAbs);
 
-          // 根据距离中心的远近调整透明度（形成波浪效果）
-          const opacity = 0.4 + 0.4 * (1 - Math.abs(distFromCenter));
+          // 计算像素位置
+          const posX = Math.floor(x * (physicalCellSize + physicalGap));
+          const posY = Math.floor(y * (physicalCellSize + physicalGap) + waveOffset);
 
-          // 获取颜色
-          const colorType = this.colors[y][x];
-          let r, g, b;
-
-          if (isDark) {
-            if (colorType === 0) {
-              r = this.colorsConfig.darkWhite.r;
-              g = this.colorsConfig.darkWhite.g;
-              b = this.colorsConfig.darkWhite.b;
-            } else {
-              r = this.colorsConfig.darkGreen.r;
-              g = this.colorsConfig.darkGreen.g;
-              b = this.colorsConfig.darkGreen.b;
-            }
-          } else {
-            if (colorType === 0) {
-              r = this.colorsConfig.white.r;
-              g = this.colorsConfig.white.g;
-              b = this.colorsConfig.white.b;
-            } else {
-              r = this.colorsConfig.green.r;
-              g = this.colorsConfig.green.g;
-              b = this.colorsConfig.green.b;
-            }
+          // 边界检查
+          if (posX + physicalCellSize > canvasWidth || posY + physicalCellSize > canvasHeight || posY < 0) {
+            continue;
           }
 
-          this.ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
-          this.ctx.fillRect(posX, finalY, this.cellSize, this.cellSize);
+          // 获取颜色（使用距离中心的透明度）
+          const colorType = this.colors[idx];
+          const color = colorType === 0 ? whiteLookup[opacityIndex] : greenLookup[opacityIndex];
+
+          // 绘制细胞（填充矩形区域）
+          for (let py = 0; py < physicalCellSize; py++) {
+            const rowOffset = (posY + py) * canvasWidth;
+            for (let px = 0; px < physicalCellSize; px++) {
+              const pixelIdx = rowOffset + posX + px;
+              if (pixelIdx >= 0 && pixelIdx < buffer.length) {
+                buffer[pixelIdx] = color;
+              }
+            }
+          }
         }
       }
+
+      // 一次性提交到 Canvas
+      this.ctx.putImageData(this.imageData, 0, 0);
     }
 
     destroy() {

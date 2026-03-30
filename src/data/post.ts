@@ -38,12 +38,22 @@ export function getUniqueTags(posts: CollectionEntry<"post">[]) {
 
 /** returns a count of each unique tag - [[tagName, count], ...]
  *  Note: This function doesn't filter draft posts, pass it the result of getAllPosts above to do so.
+ *  "写作" tag is always placed first.
  *  */
 export function getUniqueTagsWithCount(posts: CollectionEntry<"post">[]): [string, number][] {
-	return [
+	const sortedTags = [
 		...getAllTags(posts).reduce(
 			(acc, t) => acc.set(t, (acc.get(t) ?? 0) + 1),
 			new Map<string, number>(),
 		),
 	].sort((a, b) => b[1] - a[1]);
+
+	// Move "写作" tag to the first position if it exists
+	const writingIndex = sortedTags.findIndex(([tag]) => tag === "写作");
+	if (writingIndex > 0) {
+		const writingTag = sortedTags.splice(writingIndex, 1)[0];
+		sortedTags.unshift(writingTag);
+	}
+
+	return sortedTags;
 }
