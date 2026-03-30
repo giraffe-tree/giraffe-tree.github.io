@@ -195,8 +195,8 @@
     }
 
     animate() {
-      // 每10帧更新一次生命游戏
-      if (this.generation % 10 === 0) {
+      // 每30帧更新一次生命游戏（约每秒2次）
+      if (this.generation % 30 === 0) {
         this.computeNextGeneration();
       }
 
