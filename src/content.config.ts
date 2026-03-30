@@ -56,4 +56,9 @@ const tag = defineCollection({
 	}),
 });
 
-export const collections = { post, note, tag };
+const about = defineCollection({
+	loader: glob({ base: "./src/content/about", pattern: "**/*.{md,mdx}" }),
+	schema: baseSchema,
+});
+
+export const collections = { post, note, tag, about };
