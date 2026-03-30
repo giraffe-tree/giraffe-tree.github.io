@@ -297,6 +297,16 @@
     height: 100%;
     pointer-events: none;
     z-index: 0;
+    /* 浅色模式背景 */
+    background: linear-gradient(180deg,
+      rgba(245, 245, 245, 1) 0%,
+      rgba(235, 235, 240, 1) 50%,
+      rgba(240, 240, 245, 1) 100%
+    );
+  }
+
+  /* 深色模式背景 */
+  :global([data-theme="dark"]) .particle-background {
     background: linear-gradient(180deg,
       rgba(20, 25, 35, 1) 0%,
       rgba(30, 35, 50, 1) 50%,

@@ -25,30 +25,19 @@ const tags = ["9年经验", "人本主义", "build in public"];
 
 <PageLayout meta={{ title: "Home" }} showHeader={false}>
   <div class="space-y-6">
-    <!-- 第1层：工具栏 -->
-    <div class="flex items-center justify-end gap-3 text-sm pb-4 border-b border-[var(--color-border)]">
-      <div class="flex items-center gap-1.5">
-        <div class="flex gap-0.5" id="language-switcher">
-          <button data-lang="en" class="lang-btn px-2 py-1 rounded transition-all duration-200 text-muted hover:text-[var(--color-global-text)] hover:bg-[var(--color-global-bg)]">EN</button>
-          <span class="text-muted">/</span>
-          <button data-lang="zh" class="lang-btn px-2 py-1 rounded transition-all duration-200 bg-[var(--color-link)] text-white">ZH</button>
-          <span class="text-muted">/</span>
-          <button data-lang="auto" class="lang-btn px-2 py-1 rounded transition-all duration-200 text-muted hover:text-[var(--color-global-text)] hover:bg-[var(--color-global-bg)]">自动</button>
-        </div>
-      </div>
-      <span class="text-muted">/</span>
-      <div class="flex items-center gap-1" id="theme-switcher">
-        <button id="theme-dark" class="px-2 py-1 rounded transition-all duration-200 text-muted hover:text-[var(--color-global-text)] hover:bg-[var(--color-global-bg)]">深色</button>
-        <span class="text-muted">/</span>
-        <button id="theme-light" class="px-2 py-1 rounded transition-all duration-200 bg-[var(--color-link)] text-white">浅色</button>
-      </div>
-    </div>
+    <!-- 第1层：主导航 -->
+    <nav class="flex items-center gap-6 py-3 border-b border-[var(--color-border)]">
+      <a href="/posts/" class="text-sm font-medium text-[var(--color-global-text)] hover:text-[var(--color-link)] transition-colors">文章</a>
+      <a href="/notes/" class="text-sm font-medium text-[var(--color-global-text)] hover:text-[var(--color-link)] transition-colors">笔记</a>
+      <a href="/about/" class="text-sm font-medium text-[var(--color-global-text)] hover:text-[var(--color-link)] transition-colors">关于</a>
+    </nav>
 
-    <!-- 第2层：身份标题 -->
+    <!-- 第3层：身份标题 -->
     <div class="pb-4 border-b border-[var(--color-border)]">
       <!-- 命令行输入 -->
-      <div class="font-mono text-muted text-sm min-h-[1.5em]">
-        <span class="terminal-prompt">ernest@hangzhou:~$ </span>
+      <div class="font-mono text-muted text-sm min-h-[1.5em] overflow-hidden">
+        <span class="terminal-prompt hidden sm:inline">ernest@hangzhou:~$ </span>
+        <span class="terminal-prompt sm:hidden">~$ </span>
         <span id="typewriter-command"></span><span id="command-cursor" class="cursor">█</span>
       </div>
       <!-- 命令输出 -->
@@ -166,11 +155,11 @@ const tags = ["9年经验", "人本主义", "build in public"];
     <!-- 第6层：分类内容 -->
     <div class="pt-6 border-t border-[var(--color-border)]">
       <!-- 分类导航 -->
-      <div class="flex items-center gap-6 mb-6 border-b border-[var(--color-border)]">
+      <div class="flex items-center gap-6 mb-6 border-b border-[var(--color-border)] overflow-x-auto pb-0 -mx-6 px-6 sm:mx-0 sm:px-0 scrollbar-hide">
         {categories.map((cat, index) => (
           <button
             data-category={cat.id}
-            class={`category-tab relative pb-3 px-2 -mx-2 text-sm font-medium rounded-t-lg transition-all duration-300 border-b-2 -mb-[2px] ${
+            class={`category-tab relative pb-3 px-2 -mx-2 text-sm font-medium rounded-t-lg transition-all duration-300 border-b-2 -mb-[2px] whitespace-nowrap ${
               index === 0
                 ? "border-[var(--color-link)] text-[var(--color-global-text)]"
                 : "border-transparent text-muted hover:text-[var(--color-global-text)] hover:border-[var(--color-link)] hover:bg-[var(--color-global-bg)]"
@@ -287,74 +276,6 @@ const tags = ["9年经验", "人本主义", "build in public"];
           content.classList.add('hidden');
         }
       });
-    });
-  });
-
-  // 主题切换功能
-  const themeDark = document.getElementById('theme-dark');
-  const themeLight = document.getElementById('theme-light');
-  const html = document.documentElement;
-
-  function updateThemeButtons(theme: string) {
-    if (theme === 'dark') {
-      themeDark?.classList.add('bg-[var(--color-link)]', 'text-white');
-      themeDark?.classList.remove('text-muted');
-      themeLight?.classList.remove('bg-[var(--color-link)]', 'text-white');
-      themeLight?.classList.add('text-muted');
-    } else {
-      themeLight?.classList.add('bg-[var(--color-link)]', 'text-white');
-      themeLight?.classList.remove('text-muted');
-      themeDark?.classList.remove('bg-[var(--color-link)]', 'text-white');
-      themeDark?.classList.add('text-muted');
-    }
-  }
-
-  themeDark?.addEventListener('click', () => {
-    html.setAttribute('data-theme', 'dark');
-    localStorage.setItem('theme', 'dark');
-    updateThemeButtons('dark');
-  });
-
-  themeLight?.addEventListener('click', () => {
-    html.setAttribute('data-theme', 'light');
-    localStorage.setItem('theme', 'light');
-    updateThemeButtons('light');
-  });
-
-  // 初始化主题按钮状态
-  const currentTheme = html.getAttribute('data-theme') || 'light';
-  updateThemeButtons(currentTheme);
-
-  // 初始化语言按钮状态
-  const currentLang = localStorage.getItem('lang') || 'zh';
-  updateLangButtons(currentLang);
-
-  // 语言切换功能
-  const langButtons = document.querySelectorAll('.lang-btn');
-
-  function updateLangButtons(activeLang: string) {
-    langButtons.forEach((btn) => {
-      const btnLang = btn.dataset.lang;
-      if (btnLang === activeLang) {
-        btn.classList.remove('text-muted', 'hover:text-[var(--color-global-text)]', 'hover:bg-[var(--color-global-bg)]');
-        btn.classList.add('bg-[var(--color-link)]', 'text-white');
-      } else {
-        btn.classList.remove('bg-[var(--color-link)]', 'text-white');
-        btn.classList.add('text-muted', 'hover:text-[var(--color-global-text)]', 'hover:bg-[var(--color-global-bg)]');
-      }
-    });
-  }
-
-  langButtons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const lang = btn.dataset.lang;
-      localStorage.setItem('lang', lang || 'auto');
-      updateLangButtons(lang || 'zh');
-
-      // 这里可以添加页面语言切换逻辑
-      if (lang && lang !== 'auto') {
-        document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
-      }
     });
   });
 </script>

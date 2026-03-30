@@ -12,11 +12,58 @@ const { headings } = Astro.props;
 const toc = generateToc(headings);
 ---
 
-<details open class="lg:sticky lg:top-12 lg:order-2 lg:-me-32 lg:basis-64">
-	<summary class="title hover:marker:text-accent cursor-pointer text-lg">Table of Contents</summary>
-	<nav class="ms-4 lg:w-full">
-		<ol class="mt-4">
+<!-- 大屏幕：右侧固定悬浮 -->
+<div class="toc-container hidden lg:block">
+	<button
+		id="toc-toggle"
+		class="fixed right-4 top-16 z-50 w-10 h-10 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] shadow-lg flex items-center justify-center text-[var(--color-global-text)] hover:text-[var(--color-link)] hover:border-[var(--color-link)] transition-all duration-200"
+		aria-label="切换目录"
+	>
+		<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+			<path d="M3 9h18"/>
+			<path d="M3 15h18"/>
+			<path d="M9 3v18"/>
+			<path d="M15 3v18"/>
+		</svg>
+	</button>
+
+	<details
+		id="toc-panel"
+		open
+		class="fixed right-4 top-28 w-56 max-h-[calc(100vh-8rem)] bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg shadow-xl z-40 overflow-y-auto"
+	>
+		<summary class="sticky top-0 bg-[var(--color-surface)] px-4 py-3 text-sm font-medium text-[var(--color-global-text)] hover:text-[var(--color-link)] cursor-pointer border-b border-[var(--color-border)] flex items-center gap-2">
+			<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<path d="M3 9h18"/>
+				<path d="M3 15h18"/>
+				<path d="M9 3v18"/>
+				<path d="M15 3v18"/>
+			</svg>
+			目录
+		</summary>
+		<nav class="p-3">
+			<ol class="space-y-1">
+				{toc.map((heading) => <TOCHeading heading={heading} />)}
+			</ol>
+		</nav>
+	</details>
+</div>
+
+<!-- 小屏幕：顶部折叠 -->
+<details class="lg:hidden mb-6 p-4 bg-[var(--color-global-bg)] rounded-lg border border-[var(--color-border)]">
+	<summary class="font-medium text-[var(--color-global-text)] cursor-pointer">📑 目录</summary>
+	<nav class="mt-3">
+		<ol class="space-y-1 text-sm">
 			{toc.map((heading) => <TOCHeading heading={heading} />)}
 		</ol>
 	</nav>
 </details>
+
+<script>
+	const tocToggle = document.getElementById('toc-toggle');
+	const tocPanel = document.getElementById('toc-panel');
+
+	tocToggle?.addEventListener('click', () => {
+		tocPanel?.toggleAttribute('open');
+	});
+</script>

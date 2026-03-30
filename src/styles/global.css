@@ -103,6 +103,35 @@
 			--color-quote var(--color-mode-transition-duration) var(--color-mode-transition-easing);
 	}
 
+	/* 中文排版优化 */
+	body {
+		font-family:
+			-apple-system, BlinkMacSystemFont,
+			"Segoe UI", Roboto,
+			"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+			sans-serif;
+		line-height: 1.75;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+
+	/* 图片暗化适配深色模式 */
+	[data-theme="dark"] img {
+		filter: brightness(0.92) contrast(1.05);
+		transition: filter 0.3s ease;
+	}
+
+	/* 代码块平滑过渡 */
+	[data-theme="dark"] pre,
+	[data-theme="dark"] code {
+		transition: background-color 0.3s ease;
+	}
+
+	/* 按钮点击反馈 */
+	button:active, a:active {
+		transform: scale(0.97);
+	}
+
 	:target {
 		scroll-margin-block: 5ex;
 	}
@@ -147,4 +176,35 @@
 	--tw-prose-links: var(--color-global-text);
 	--tw-prose-quotes: var(--color-quote);
 	--tw-prose-th-borders: #666;
+
+	/* 表格样式 */
+	& table {
+		@apply w-full text-sm border-collapse my-6;
+	}
+
+	& table th {
+		@apply bg-[var(--color-global-bg)] font-semibold p-3 text-left border-b-2 border-[var(--color-border)];
+	}
+
+	& table td {
+		@apply p-3 border-b border-[var(--color-border)];
+	}
+
+	& table tr:nth-child(even) {
+		@apply bg-[var(--color-global-bg)]/30;
+	}
+
+	& table tr:hover {
+		@apply bg-[var(--color-global-bg)]/50;
+	}
+
+	/* 标题字间距 */
+	& h1, & h2, & h3 {
+		letter-spacing: 0.02em;
+	}
+
+	/* 正文最佳行长 - 中文每行25-35字 */
+	& p {
+		max-width: 65ch;
+	}
 }

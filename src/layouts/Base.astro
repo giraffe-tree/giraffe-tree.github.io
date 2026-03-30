@@ -25,12 +25,12 @@ const {
 		<ThemeProvider />
 	</head>
 	<body
-		class="bg-global-bg text-global-text relative mx-auto flex min-h-screen max-w-2xl flex-col px-6 pt-12 font-sans text-base antialiased"
+		class="bg-global-bg text-global-text relative mx-auto flex min-h-screen max-w-4xl flex-col px-6 pt-6 font-sans text-base antialiased"
 	>
 		<ParticleBackground />
 		<SkipLink />
 		{showHeader && <Header />}
-		<main id="main" class="bg-[var(--color-surface)] shadow-sm rounded-lg p-6 sm:p-8 relative z-10">
+		<main id="main" class="bg-[var(--color-surface)] shadow-sm rounded-lg px-6 sm:px-8 pt-3 pb-6 sm:pb-8 relative z-10">
 			<slot />
 		</main>
 		<Footer />
