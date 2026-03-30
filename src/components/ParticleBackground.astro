@@ -200,15 +200,6 @@
         this.computeNextGeneration();
       }
 
-      // 波浪偏移动画
-      this.waveOffset += 0.02;
-
-      // 预计算波浪偏移查找表
-      const centerY = this.rows / 2;
-      for (let x = 0; x < this.cols; x++) {
-        this.waveLookup[x] = Math.sin(x * 0.1 + this.waveOffset);
-      }
-
       // 绘制网格
       this.drawGrid();
 
@@ -247,8 +238,8 @@
 
           if (this.grid[idx] === 0) continue;
 
-          // 计算波浪偏移（每列独立）
-          const waveOffset = this.waveLookup[x] * 30 * dpr * (1 - distAbs);
+          // 波纹效果已取消
+          const waveOffset = 0;
 
           // 计算像素位置
           const posX = Math.floor(x * (physicalCellSize + physicalGap));
