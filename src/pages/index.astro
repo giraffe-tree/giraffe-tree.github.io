@@ -109,13 +109,17 @@ const tags = ["9年经验", "人本主义", "build in public"];
         await new Promise(r => setTimeout(r, 400));
 
         // 隐藏命令行光标，显示输出行光标
-        commandCursor?.classList.add('hidden');
+        if (commandCursor) {
+          commandCursor.style.display = 'none';
+        }
         outputCursor?.classList.remove('hidden');
         outputCursor?.classList.add('typing');
 
         // 第二阶段：输出个人介绍
         await typeText(outputEl!, outputText, 60);
-        outputCursor?.classList.remove('typing');
+        if (outputCursor) {
+          outputCursor.style.display = 'none';
+        }
       }
 
       // 页面加载后开始动画
