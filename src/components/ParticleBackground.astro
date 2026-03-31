@@ -192,19 +192,33 @@
         this.randomizeGrid();
       }, { passive: true });
 
+      // 页面不可见时暂停，可见时恢复
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          this.stop();
+        } else {
+          this.start();
+        }
+      });
+    }
+
+    start() {
+      if (this.animationId) return;
+      this.animate();
+    }
+
+    stop() {
+      if (this.animationId) {
+        cancelAnimationFrame(this.animationId);
+        this.animationId = 0;
+      }
     }
 
     animate() {
-      // 每30帧更新一次生命游戏（约每秒2次）
-      if (this.generation % 30 === 0) {
-        this.computeNextGeneration();
-      }
-
-      // 绘制网格
+      this.computeNextGeneration();
       this.drawGrid();
-
-      this.generation++;
-      this.animationId = requestAnimationFrame(() => this.animate());
+      // 使用 setTimeout 精确控制频率，每 200ms 更新一次（每秒 5 次）
+      this.animationId = window.setTimeout(() => this.animate(), 200);
     }
 
     drawGrid() {
@@ -272,7 +286,10 @@
     }
 
     destroy() {
-      cancelAnimationFrame(this.animationId);
+      if (this.animationId) {
+        clearTimeout(this.animationId);
+        this.animationId = 0;
+      }
     }
   }
 
