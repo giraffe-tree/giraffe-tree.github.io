@@ -24,5 +24,12 @@ pnpm-debug.log*
 .cache
 .astro
 
+# IDE / Editor
 .idea
+.vscode
+.zed
+.cursor
+
+# Claude Code
+.claude/
 

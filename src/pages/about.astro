@@ -17,6 +17,19 @@ const meta = {
 ---
 
 <PageLayout meta={meta}>
+  <div class="mb-2 flex items-center gap-4">
+    <a
+      href="/"
+      class="inline-flex items-center gap-2 text-sm text-muted hover:text-accent transition-colors"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m3 9 9-7 9 7"/>
+        <path d="M9 22V12h6v10"/>
+        <path d="M2 12h20"/>
+      </svg>
+      首页
+    </a>
+  </div>
   <div class="prose prose-sm prose-cactus max-w-none">
     <Content />
   </div>
