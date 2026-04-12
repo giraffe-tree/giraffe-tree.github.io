@@ -203,8 +203,8 @@
 		letter-spacing: 0.02em;
 	}
 
-	/* 正文最佳行长 - 中文每行25-35字 */
+	/* 正文最佳行长  */
 	& p {
-		max-width: 65ch;
+		max-width: 800px;
 	}
 }
