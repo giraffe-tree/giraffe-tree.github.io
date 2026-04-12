@@ -20,7 +20,7 @@ const categories = [
   { id: "travel", name: "旅行", tag: "旅行", posts: travel },
 ];
 
-const tags = ["9年经验", "人本主义", "build in public"];
+const tags = ["builder", "人本主义", "build in public"];
 ---
 
 <PageLayout meta={{ title: "Home" }} showHeader={false}>
@@ -66,7 +66,7 @@ const tags = ["9年经验", "人本主义", "build in public"];
     <script>
       // 打字机动画
       const commandText = 'whoami';
-      const outputText = '你好，我是 Ernest，一个喜欢写代码和思考的开发者。';
+      const outputText = '你好，我是 Ernest，一个喜欢思考的人本主义开发者。';
       const commandEl = document.getElementById('typewriter-command');
       const outputEl = document.getElementById('typewriter-output');
       const commandCursor = document.getElementById('command-cursor');
@@ -120,12 +120,21 @@ const tags = ["9年经验", "人本主义", "build in public"];
     </script>
 
     <!-- 第3层：格言 -->
-    <p class="text-lg text-muted italic">
-      活出自我
+    <p class="text-lg text-muted italic mb-2">
+      活出自我, 过你愿意重复的一天
     </p>
 
-    <!-- 第4层：社交链接 -->
-    <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm pb-4 border-b border-[var(--color-border)]">
+    <!-- 第4层：标签 -->
+    <div class="flex flex-wrap items-center gap-2 pb-2">
+      {tags.map((tag) => (
+        <span class="px-3 py-1 text-xs bg-[var(--color-global-bg)] text-muted rounded-full border border-[var(--color-border)] hover:border-[var(--color-link)] hover:text-[var(--color-global-text)] transition-all duration-200 cursor-default">
+          {tag}
+        </span>
+      ))}
+    </div>
+
+    <!-- 第5层：社交链接 -->
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm pb-2 border-b border-[var(--color-border)]">
       <a href="https://www.xiaohongshu.com/user/profile/64be88d1000000001403cf18" target="_blank" rel="noopener" class="text-[var(--color-link)] hover:text-[var(--color-global-text)] transition-colors duration-200 hover:underline underline-offset-2">
         小红书
       </a>
@@ -143,17 +152,7 @@ const tags = ["9年经验", "人本主义", "build in public"];
       <span id="copy-toast" class="text-xs text-muted opacity-0 transition-opacity">已复制!</span>
     </div>
 
-    <!-- 第5层：标签 -->
-    <div class="flex flex-wrap items-center gap-2 pb-4">
-      {tags.map((tag) => (
-        <span class="px-3 py-1 text-xs bg-[var(--color-global-bg)] text-muted rounded-full border border-[var(--color-border)] hover:border-[var(--color-link)] hover:text-[var(--color-global-text)] transition-all duration-200 cursor-default">
-          {tag}
-        </span>
-      ))}
-    </div>
-
     <!-- 第6层：分类内容 -->
-    <div class="pt-6 border-t border-[var(--color-border)]">
       <!-- 分类导航 -->
       <div class="flex items-center gap-6 mb-6 border-b border-[var(--color-border)] overflow-x-auto pb-0 -mx-6 px-6 sm:mx-0 sm:px-0 scrollbar-hide">
         {categories.map((cat, index) => (
